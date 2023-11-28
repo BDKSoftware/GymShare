@@ -1,0 +1,47 @@
+Outline for the App:
+
+Auth Route (Redux Auth, Profile Picture, Display Name)
+
+Auth Screens: 
+- Login Form
+- Sign Up Form 
+- Forgot Password Form
+
+Home Route
+
+Global: 
+- Tab Bar
+    - Social Screen (Where you can see your friends workouts)
+    - Home Screen 
+    - Profile Screen
+
+- Top Bar
+    - Profile Picture
+    - Settings Menu
+
+
+Social Screen:
+- Feed To Show your friends past workouts
+    - User Picture - Username
+    - estimated calories Burned
+    - time elapsed
+    - Button to see workout details
+
+Home Screen: 
+    - Track new workout/ Shared Workout
+    - Track Past workouts
+
+
+Profile Screen: 
+    - Profile Picture
+    - Username
+    - User Weight
+    - Past Workout Feed
+
+Settings Screen: 
+    - Public or Private 
+        Allows users to see if everyone can see their profile or just Profile Picture and name
+    - Light or Dark mode
+    - LB or KG
+    - Change Profile Picture
+    - Change Display name
