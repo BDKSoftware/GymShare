@@ -1,10 +1,13 @@
 import React from "react";
 import { Text, SafeAreaView } from "react-native";
+import { auth } from "../../../firebase";
 
 function Home() {
+  let displayName = auth.currentUser.email;
+
   return (
     <SafeAreaView>
-      <Text>Home</Text>
+      <Text>{displayName}</Text>
     </SafeAreaView>
   );
 }

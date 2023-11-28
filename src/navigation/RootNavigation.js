@@ -6,8 +6,20 @@ const Stack = createNativeStackNavigator();
 
 const RootNavigation = () => {
   return (
-    <Stack.Navigator initialRouteName="Home">
-      <Stack.Screen name="Home" component={Home} />
+    <Stack.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen
+        name="Home"
+        component={Home}
+        options={{
+          gestureEnabled: false,
+          fullScreenGestureEnabled: false,
+        }}
+      />
     </Stack.Navigator>
   );
 };
