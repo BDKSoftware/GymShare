@@ -1,9 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Appearance } from "react-native";
+
+let initialState = Appearance.getColorScheme();
 
 const themeSlice = createSlice({
   name: "theme",
   initialState: {
-    value: "light",
+    value: initialState !== null ? initialState : "light",
+    // value: "light",
   },
 
   reducers: {

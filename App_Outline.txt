@@ -12,7 +12,7 @@ Home Route
 Global: 
 - Tab Bar
     - Social Screen (Where you can see your friends workouts)
-    - Home Screen 
+    - Home Screen (Create new workouts and show past workouts)
     - Profile Screen
 
 - Top Bar

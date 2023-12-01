@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth } from "../../firebase";
+import { useNavigation } from "@react-navigation/native";
+import { signOut } from "firebase/auth";
 
 const AuthContext = createContext();
 
@@ -18,6 +20,7 @@ export function AuthProvider({ children }) {
     setIsLoggedIn(false);
     setUser(null);
     AsyncStorage.removeItem("user");
+    signOut(auth);
   }
 
   useEffect(() => {

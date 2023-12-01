@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   TouchableOpacity,
   View,
   SafeAreaView,
   StyleSheet,
-  Image,
-  TextInput,
   KeyboardAvoidingView,
 } from "react-native";
+import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { auth } from "../../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useAuth } from "../../context/AuthContext";
+import AuthInput from "../../components/AuthInput";
+import AuthButton from "../../components/AuthButton";
 
 import colors from "../../../theme";
 
@@ -22,16 +23,24 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const { logIn } = useAuth();
-
+  const { isLoggedIn } = useAuth();
   const navigation = useNavigation();
+
   const theme = useSelector((state) => state.theme.value);
+
+  function clearState() {
+    setEmail("");
+    setPassword("");
+  }
 
   function onClickForgotPassword() {
     navigation.navigate("ForgotPassword");
+    clearState();
   }
 
   function onClickSignUp() {
     navigation.navigate("Register");
+    clearState();
   }
 
   async function onClickSignIn() {
@@ -41,6 +50,7 @@ function Login() {
         const user = userCredential.user;
         logIn(user);
         navigation.navigate("Root");
+        clearState();
       })
       .catch((error) => {
         setError(true);
@@ -58,25 +68,23 @@ function Login() {
         <Image
           source={require("../../../assets/logo.png")}
           style={styles.logo}
+          contentFit="contain"
         />
 
-        <TextInput
-          style={theme === "light" ? styles.lightInput : styles.darkInput}
+        <AuthInput
+          theme={theme}
           placeholder="Email"
-          placeholderTextColor={theme === "light" ? colors.light.accent : white}
           onChangeText={(email) => setEmail(email)}
           value={email}
-          className="input"
+          secureTextEntry={false}
           onFocus={() => setError(false)}
         />
-        <TextInput
-          style={theme === "light" ? styles.lightInput : styles.darkInput}
+        <AuthInput
+          theme={theme}
           placeholder="Password"
-          placeholderTextColor={theme === "light" ? colors.light.accent : white}
           onChangeText={(password) => setPassword(password)}
           value={password}
           secureTextEntry={true}
-          className="input"
           onFocus={() => setError(false)}
         />
         <View style={styles.forgotPasswordContainer}>
@@ -89,19 +97,7 @@ function Login() {
           An Error Has Occured, Please Try Again
         </Text>
 
-        <TouchableOpacity
-          style={theme == "light" ? styles.lightButton : styles.darkButton}
-          activeOpacity={0.7}
-          onPress={onClickSignIn}
-        >
-          <Text
-            style={
-              theme == "light" ? styles.lightButtonText : styles.darkButtonText
-            }
-          >
-            Sign In
-          </Text>
-        </TouchableOpacity>
+        <AuthButton theme={theme} title="Sign In" onPress={onClickSignIn} />
       </KeyboardAvoidingView>
       <View>
         <TouchableOpacity onPress={onClickSignUp}>
@@ -144,63 +140,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 200,
     height: 200,
-    resizeMode: "contain",
-  },
-
-  lightInput: {
-    width: "90%",
-    height: 50,
-    backgroundColor: colors.light.background,
-    color: colors.light.accent,
-    borderRadius: 10,
-    paddingLeft: 10,
-    marginTop: 20,
-    borderColor: colors.light.accent,
-    borderWidth: 1,
-  },
-
-  darkInput: {
-    width: "90%",
-    height: 50,
-    backgroundColor: colors.dark.background,
-    color: "white",
-    borderRadius: 10,
-    paddingLeft: 10,
-    marginTop: 20,
-    borderColor: "white",
-    borderWidth: 1,
-  },
-
-  lightButton: {
-    width: "90%",
-    height: 50,
-    backgroundColor: colors.light.accent,
-    borderRadius: 10,
-    marginTop: 30,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  darkButton: {
-    width: "90%",
-    height: 50,
-    backgroundColor: colors.dark.accent,
-    borderRadius: 10,
-    marginTop: 30,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  lightButtonText: {
-    color: colors.light.background,
-    fontSize: 20,
-  },
-
-  darkButtonText: {
-    color: "white",
-    fontSize: 20,
   },
 
   forgotPasswordContainer: {
