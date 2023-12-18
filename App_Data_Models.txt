@@ -19,4 +19,7 @@ workout:
     - timeCompleted (timeStamp)
     - caloriesBurned
     - WorkoutName (optional)
+
+Exercises: 
+    - 
         
