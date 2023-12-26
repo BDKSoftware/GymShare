@@ -40,12 +40,7 @@ function Profile() {
     });
   };
 
-  useEffect(() => {
-    updateProfile(auth.currentUser, {
-      photoURL:
-        "https://firebasestorage.googleapis.com/v0/b/gymshare-2cbf8.appspot.com/o/profilePictures%2Fimage_123650291.JPG?alt=media&token=7d8a06da-b978-4fe0-831a-ea20d6731433",
-    });
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <SafeAreaView
@@ -80,9 +75,21 @@ function Profile() {
         </View>
       </View>
       <View style={styles.pastWorkoutContainer}>
-        <Text style={styles.pastWorkoutTitle}>Past Workouts</Text>
+        <Text
+          style={
+            theme === "light"
+              ? styles.pastWorkoutTitleLight
+              : styles.pastWorkoutTitleDark
+          }
+        >
+          Past Workouts:
+        </Text>
         <View style={styles.pastWorkouts}>
-          <Text>{`No Workouts Saved :(`}</Text>
+          <Text
+            style={
+              theme === "light" ? styles.noWorkoutsLight : styles.noWorkoutsDark
+            }
+          >{`No Workouts Saved :(`}</Text>
         </View>
       </View>
     </SafeAreaView>
@@ -159,17 +166,36 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 
-  pastWorkoutTitle: {
+  pastWorkoutTitleLight: {
     fontSize: 20,
     fontWeight: "bold",
     alignSelf: "flex-start",
   },
 
+  pastWorkoutTitleDark: {
+    fontSize: 20,
+    fontWeight: "bold",
+    alignSelf: "flex-start",
+    color: colors.dark.accent,
+  },
+
   pastWorkouts: {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
     width: "100%",
     height: "100%",
+    padding: 10,
+    marginTop: 10,
+  },
+
+  noWorkoutsLight: {
+    fontSize: 16,
+    color: "#000",
+  },
+
+  noWorkoutsDark: {
+    fontSize: 16,
+    color: colors.dark.accent,
   },
 });
