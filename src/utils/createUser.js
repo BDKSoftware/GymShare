@@ -1,5 +1,6 @@
-import { db } from "../../firebase";
+import { db, auth } from "../../firebase";
 import { collection, doc, setDoc } from "firebase/firestore";
+import { updateProfile } from "firebase/auth";
 
 export default async function createUser(uid, name, email) {
   let userRef = doc(db, "users", uid);
@@ -19,6 +20,11 @@ export default async function createUser(uid, name, email) {
   })
     .then(() => {
       console.log("User successfully created!");
+      updateProfile(auth.currentUser, {
+        displayName: name,
+        photoURL:
+          "https://firebasestorage.googleapis.com/v0/b/gymshare-2cbf8.appspot.com/o/logo.png?alt=media&token=f18d2713-a4c2-4139-9e9f-af7020b154a8",
+      });
     })
     .catch((error) => {
       console.error("Error creating user: ", error);

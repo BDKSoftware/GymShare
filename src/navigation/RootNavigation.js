@@ -6,8 +6,7 @@ import colors from "../../theme";
 
 import Home from "../screens/Home/Home";
 import Social from "../screens/Social/Social";
-import Profile from "../screens/Profile/Profile";
-import { NavigationContainer } from "@react-navigation/native";
+import ProfileNavigation from "./ProfileNavigation";
 
 const Tabs = createBottomTabNavigator();
 
@@ -58,8 +57,8 @@ const RootNavigation = () => {
         }}
       />
       <Tabs.Screen
-        name="Profile"
-        component={Profile}
+        name="ProfileNavigation"
+        component={ProfileNavigation}
         options={{
           gestureEnabled: false,
           fullScreenGestureEnabled: false,
