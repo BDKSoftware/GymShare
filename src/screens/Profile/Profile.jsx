@@ -1,23 +1,23 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import {
   Text,
   SafeAreaView,
-  Button,
   StyleSheet,
   View,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { auth } from "../../../firebase";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
 import colors from "../../../theme";
-import { changeTheme } from "../../store/themeSlice";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { updateProfile } from "firebase/auth";
 import { Image } from "expo-image";
+
+//Components
+import PastWorkouts from "./components/PastWorkouts";
+import Stats from "./components/Stats";
 
 function Profile() {
   let userEmail = auth.currentUser.email;
@@ -26,12 +26,9 @@ function Profile() {
   const { logOut } = useAuth();
   const navigation = useNavigation();
   const theme = useSelector((state) => state.theme.value);
-  const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    logOut();
-    navigation.navigate("Login");
-  };
+  // State
+  const [view, setView] = useState("pw"); // pastWorkouts, Stats
 
   const handleSettings = () => {
     navigation.navigate("ProfileNavigation", {
@@ -39,8 +36,6 @@ function Profile() {
       initial: false,
     });
   };
-
-  useEffect(() => {}, []);
 
   return (
     <SafeAreaView
@@ -52,6 +47,8 @@ function Profile() {
             name="settings-sharp"
             size={24}
             color={colors.dark.accent}
+            contentFit="contain"
+            transition={1000}
           />
         </Pressable>
       </View>
@@ -75,22 +72,35 @@ function Profile() {
         </View>
       </View>
       <View style={styles.pastWorkoutContainer}>
-        <Text
+        <View
           style={
             theme === "light"
-              ? styles.pastWorkoutTitleLight
-              : styles.pastWorkoutTitleDark
+              ? styles.switchButtonContainerLight
+              : styles.switchButtonContainerDark
           }
         >
-          Past Workouts:
-        </Text>
-        <View style={styles.pastWorkouts}>
-          <Text
-            style={
-              theme === "light" ? styles.noWorkoutsLight : styles.noWorkoutsDark
-            }
-          >{`No Workouts Saved :(`}</Text>
+          <TouchableOpacity
+            style={view === "pw" ? styles.active : styles.inactive}
+            onPress={() => setView("pw")}
+          >
+            <Text
+              style={view === "pw" ? styles.activeText : styles.inactiveText}
+            >
+              Past Workouts
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={view === "stats" ? styles.active : styles.inactive}
+            onPress={() => setView("stats")}
+          >
+            <Text
+              style={view === "stats" ? styles.activeText : styles.inactiveText}
+            >
+              My Statistics
+            </Text>
+          </TouchableOpacity>
         </View>
+        {view === "pw" ? <PastWorkouts /> : <Stats />}
       </View>
     </SafeAreaView>
   );
@@ -132,7 +142,7 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
     borderRadius: 50,
-    resizeMode: "contain",
+
     borderColor: colors.dark.accent,
     borderWidth: 5,
     marginRight: 30,
@@ -197,5 +207,58 @@ const styles = StyleSheet.create({
   noWorkoutsDark: {
     fontSize: 16,
     color: colors.dark.accent,
+  },
+
+  switchButtonContainerLight: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "80%",
+    height: 40,
+    borderColor: colors.dark.accent,
+    borderWidth: 1,
+    borderRadius: 50,
+  },
+
+  switchButtonContainerDark: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    width: "80%",
+    backgroundColor: "#48494b",
+    borderRadius: 50,
+    height: 40,
+  },
+
+  active: {
+    backgroundColor: colors.dark.accent,
+    width: "50%",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 50,
+  },
+
+  inactive: {
+    backgroundColor: "transparent",
+    width: "50%",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 50,
+  },
+
+  activeText: {
+    color: "#fff",
+    fontSize: 16,
+  },
+
+  inactiveText: {
+    color: colors.dark.accent,
+    fontSize: 16,
   },
 });
