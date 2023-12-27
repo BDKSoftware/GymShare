@@ -57,7 +57,7 @@ const RootNavigation = () => {
         }}
       />
       <Tabs.Screen
-        name="ProfileNavigation"
+        name="Profile"
         component={ProfileNavigation}
         options={{
           gestureEnabled: false,

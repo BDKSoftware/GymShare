@@ -1,25 +1,40 @@
 import React from "react";
-import { Text, SafeAreaView, Button } from "react-native";
-import { auth } from "../../../firebase";
-import { useAuth } from "../../context/AuthContext";
+import { Text, View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import colors from "../../../theme";
 
 function Social() {
-  let displayName = auth.currentUser.email;
-  const { logOut } = useAuth();
   const navigation = useNavigation();
-
-  const handleLogout = () => {
-    logOut();
-    navigation.navigate("Login");
-  };
+  const theme = useSelector((state) => state.theme.value);
+  const dispatch = useDispatch();
 
   return (
-    <SafeAreaView>
+    <View
+      style={theme === "light" ? styles.lightContainer : styles.darkContainer}
+    >
       <Text>Social</Text>
-      <Button title="Logout" onPress={handleLogout} />
-    </SafeAreaView>
+    </View>
   );
 }
 
 export default Social;
+
+const styles = StyleSheet.create({
+  lightContainer: {
+    flex: 1,
+    backgroundColor: colors.light.background,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  darkContainer: {
+    flex: 1,
+    backgroundColor: colors.dark.background,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

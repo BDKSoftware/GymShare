@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { auth } from "../../../firebase";
-import { useAuth } from "../../context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import colors from "../../../theme";
@@ -23,7 +22,7 @@ function Profile() {
   let userEmail = auth.currentUser.email;
   let displayName = auth.currentUser.displayName;
   let userImage = auth.currentUser.photoURL;
-  const { logOut } = useAuth();
+
   const navigation = useNavigation();
   const theme = useSelector((state) => state.theme.value);
 
@@ -31,7 +30,7 @@ function Profile() {
   const [view, setView] = useState("pw"); // pastWorkouts, Stats
 
   const handleSettings = () => {
-    navigation.navigate("ProfileNavigation", {
+    navigation.navigate("Profile", {
       screen: "Settings",
       initial: false,
     });
@@ -142,9 +141,8 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
     borderRadius: 50,
-
     borderColor: colors.dark.accent,
-    borderWidth: 5,
+    borderWidth: 3,
     marginRight: 30,
   },
 

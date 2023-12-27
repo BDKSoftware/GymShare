@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.light.accent,
     borderRadius: 5,
     padding: 5,
-    width: 150,
+    width: 175,
     height: 40,
     display: "flex",
     justifyContent: "center",
