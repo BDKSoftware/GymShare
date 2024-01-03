@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   SafeAreaView,
@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { auth } from "../../../firebase";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import colors from "../../../theme";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,12 +19,9 @@ import PastWorkouts from "./components/PastWorkouts";
 import Stats from "./components/Stats";
 
 function Profile() {
-  let userEmail = auth.currentUser.email;
-  let displayName = auth.currentUser.displayName;
-  let userImage = auth.currentUser.photoURL;
-
   const navigation = useNavigation();
   const theme = useSelector((state) => state.theme.value);
+  const isFocused = useIsFocused();
 
   // State
   const [view, setView] = useState("pw"); // pastWorkouts, Stats
@@ -35,6 +32,12 @@ function Profile() {
       initial: false,
     });
   };
+
+  useEffect(() => {
+    if (isFocused) {
+      setView("pw");
+    }
+  }, [isFocused]);
 
   return (
     <SafeAreaView
@@ -52,21 +55,21 @@ function Profile() {
         </Pressable>
       </View>
       <View style={styles.userInfoContainer}>
-        <Image source={userImage} style={styles.userImage} />
+        <Image source={auth.currentUser.photoURL} style={styles.userImage} />
         <View>
           <Text
             style={
               theme === "light" ? styles.userNameLight : styles.userNameDark
             }
           >
-            {displayName}
+            {auth.currentUser.displayName}
           </Text>
           <Text
             style={
               theme === "light" ? styles.userEmailLight : styles.userEmailDark
             }
           >
-            {userEmail}
+            {auth.currentUser.email}
           </Text>
         </View>
       </View>

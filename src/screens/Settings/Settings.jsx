@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Text,
   SafeAreaView,
@@ -8,19 +8,26 @@ import {
   Switch,
   Touchable,
   TouchableOpacity,
+  TextInput,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
-
 import { useAuth } from "../../context/AuthContext";
-
 import { useNavigation } from "@react-navigation/native";
-
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import colors from "../../../theme";
 import { changeTheme } from "../../store/themeSlice";
-
 import { Ionicons } from "@expo/vector-icons";
 import { changeUnit } from "../../store/unitSlice";
+import { getAuth, updateProfile } from "firebase/auth";
+import * as ImagePicker from "expo-image-picker";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 
 function Settings() {
   const { logOut } = useAuth();
@@ -28,6 +35,82 @@ function Settings() {
   const theme = useSelector((state) => state.theme.value);
   const unit = useSelector((state) => state.unit.value);
   const dispatch = useDispatch();
+  const storage = getStorage();
+
+  const auth = getAuth();
+  const displayName = auth.currentUser.displayName;
+  const [userName, setUsername] = useState(displayName);
+  const [loading, setLoading] = useState(false);
+
+  const uploadImageToFirebaseStorage = async (uri) => {
+    try {
+      setLoading(true);
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const myRef = await uploadBytesResumable(
+        ref(storage, `profilePictures/${auth.currentUser.uid}`),
+        blob
+      );
+
+      await getDownloadURL(myRef.ref)
+        .then((downloadURL) => {
+          console.log("File Available At: ", downloadURL);
+          updateProfile(auth.currentUser, {
+            photoURL: downloadURL,
+          })
+            .then(() => {
+              setLoading(false);
+              alert("Profile Picture Updated!");
+            })
+            .catch((error) => {
+              console.log("Error updating profile picture");
+              setLoading(false);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+          Alert("Error Uploading Image, Please try again later");
+        });
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      Alert("Error Uploading Image, Please try again later");
+    }
+  };
+
+  const openCamera = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Sorry, we need camera roll permissions to make this work!");
+    } else {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        let uri = result.assets[0].uri;
+        let uploadUri =
+          Platform.OS === "ios" ? uri.replace("file://", "") : uri;
+        uploadImageToFirebaseStorage(uploadUri);
+      }
+    }
+  };
+
+  function updateUsername() {
+    updateProfile(auth.currentUser, {
+      displayName: userName,
+    })
+      .then(() => {
+        alert("Username Updated!");
+      })
+      .catch((error) => {
+        console.log("Error updating username");
+      });
+  }
 
   function changeColorTheme() {
     if (theme === "light") {
@@ -60,6 +143,24 @@ function Settings() {
     <SafeAreaView
       style={theme === "light" ? styles.lightContainer : styles.darkContainer}
     >
+      <Modal visible={loading} animationType="slide" transparent={true}>
+        <View
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          <View style={theme === "light" ? styles.modal : styles.modalDark}>
+            <ActivityIndicator size="large" color={colors.dark.accent} />
+            <Text style={{ color: colors.dark.accent, marginTop: 20 }}>
+              Uploading Image...
+            </Text>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.goBack}>
         <Pressable onPress={goBack}>
           <Ionicons
@@ -98,15 +199,22 @@ function Settings() {
         <Text style={theme === "light" ? styles.themeLight : styles.themeDark}>
           Username
         </Text>
-        <TouchableOpacity style={styles.updateButton}>
-          <Text style={styles.updateText}>Update Username</Text>
-        </TouchableOpacity>
+
+        <TextInput
+          style={styles.updateUsername}
+          onChangeText={(value) => {
+            setUsername(value);
+          }}
+          onSubmitEditing={updateUsername}
+        >
+          {userName}
+        </TextInput>
       </View>
       <View style={styles.settingsContainer}>
         <Text style={theme === "light" ? styles.themeLight : styles.themeDark}>
           Profile Picture
         </Text>
-        <TouchableOpacity style={styles.updateButton}>
+        <TouchableOpacity style={styles.updateButton} onPress={openCamera}>
           <Text style={styles.updateText}>Update Image</Text>
         </TouchableOpacity>
       </View>
@@ -212,6 +320,34 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+  },
+
+  updateUsername: {
+    color: colors.dark.accent,
+    fontSize: 18,
+    borderBottomColor: colors.dark.accent,
+    borderBottomWidth: 1,
+    width: 175,
+    height: 40,
+    paddingLeft: 5,
+  },
+
+  modal: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#fff",
+  },
+
+  modalDark: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
+    backgroundColor: colors.dark.background,
   },
 });
 
