@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 import colors from "../../theme";
 
-import Home from "../screens/Home/Home";
+import HomeNavigation from "./HomeNavigation";
 import Social from "../screens/Social/Social";
 import ProfileNavigation from "./ProfileNavigation";
 
@@ -18,6 +18,7 @@ const RootNavigation = () => {
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
+        unmountOnBlur: true,
         tabBarStyle: {
           position: "absolute",
           bottom: 0,
@@ -32,6 +33,7 @@ const RootNavigation = () => {
         name="Social"
         component={Social}
         options={{
+          // unmountOnBlur: true,
           gestureEnabled: false,
           fullScreenGestureEnabled: false,
           tabBarIcon: ({ color }) => (
@@ -44,8 +46,9 @@ const RootNavigation = () => {
       />
       <Tabs.Screen
         name="Home"
-        component={Home}
+        component={HomeNavigation}
         options={{
+          // unmountOnBlur: true,
           gestureEnabled: false,
           fullScreenGestureEnabled: false,
           tabBarIcon: ({ color }) => (
@@ -60,6 +63,7 @@ const RootNavigation = () => {
         name="Profile"
         component={ProfileNavigation}
         options={{
+          // unmountOnBlur: true,
           gestureEnabled: false,
           fullScreenGestureEnabled: false,
           tabBarIcon: ({ color }) => (

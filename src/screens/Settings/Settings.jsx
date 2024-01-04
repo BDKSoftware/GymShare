@@ -6,7 +6,6 @@ import {
   View,
   Pressable,
   Switch,
-  Touchable,
   TouchableOpacity,
   TextInput,
   Modal,
@@ -28,6 +27,8 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 function Settings() {
   const { logOut } = useAuth();
@@ -36,11 +37,17 @@ function Settings() {
   const unit = useSelector((state) => state.unit.value);
   const dispatch = useDispatch();
   const storage = getStorage();
-
   const auth = getAuth();
   const displayName = auth.currentUser.displayName;
   const [userName, setUsername] = useState(displayName);
   const [loading, setLoading] = useState(false);
+
+  function updateUserInFirebase(downloadURL) {
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    updateDoc(userRef, {
+      image: downloadURL,
+    });
+  }
 
   const uploadImageToFirebaseStorage = async (uri) => {
     try {
@@ -54,7 +61,7 @@ function Settings() {
 
       await getDownloadURL(myRef.ref)
         .then((downloadURL) => {
-          console.log("File Available At: ", downloadURL);
+          updateUserInFirebase(downloadURL);
           updateProfile(auth.currentUser, {
             photoURL: downloadURL,
           })

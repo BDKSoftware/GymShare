@@ -10,6 +10,7 @@ const ProfileNavigation = () => {
       initialRouteName="User"
       screenOptions={{
         headerShown: false,
+        unmoutOnBlur: true,
       }}
     >
       <Stack.Screen name="User" component={Profile} />

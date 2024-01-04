@@ -6,6 +6,7 @@ import {
   View,
   Pressable,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
 import { auth } from "../../../firebase";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
@@ -27,10 +28,7 @@ function Profile() {
   const [view, setView] = useState("pw"); // pastWorkouts, Stats
 
   const handleSettings = () => {
-    navigation.navigate("Profile", {
-      screen: "Settings",
-      initial: false,
-    });
+    navigation.navigate("Settings");
   };
 
   useEffect(() => {
@@ -69,7 +67,7 @@ function Profile() {
               theme === "light" ? styles.userEmailLight : styles.userEmailDark
             }
           >
-            {auth.currentUser.email}
+            TODO: ADD ADDRESS HERE
           </Text>
         </View>
       </View>
