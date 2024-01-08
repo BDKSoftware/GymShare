@@ -19,7 +19,22 @@ workout:
     - timeCompleted (timeStamp)
     - caloriesBurned
     - WorkoutName (optional)
+    - Location (optional) => Points to gym UUID in app
 
 Exercises: 
-    - 
+    - name
+    - muscleGroup
+    - equipment: [
+        - List
+        - Of 
+        - Equipment
+    ]
+
+gym: 
+    - Address
+    - name
+    - geolocation: {
+        - long
+        - lat
+    }
         

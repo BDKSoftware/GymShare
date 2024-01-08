@@ -17,6 +17,7 @@ import AuthInput from "../../components/AuthInput";
 import AuthButton from "../../components/AuthButton";
 
 import colors from "../../../theme";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function Login() {
   const [email, setEmail] = useState("");
