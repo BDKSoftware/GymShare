@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   SafeAreaView,
@@ -12,8 +12,11 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import colors from "../../../theme";
 import { Foundation } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function Home() {
+  const [location, setLocation] = useState(null);
   const navigation = useNavigation();
   const theme = useSelector((state) => state.theme.value);
   const dispatch = useDispatch();
@@ -21,6 +24,32 @@ function Home() {
   function navigateToCreateWorkout() {
     navigation.navigate("CreateWorkout");
   }
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+
+      return () => {};
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (location !== null) {
+      let coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      AsyncStorage.setItem("userLocation", JSON.stringify(coords));
+    }
+    return () => {};
+  }, [location]);
 
   return (
     <SafeAreaView
