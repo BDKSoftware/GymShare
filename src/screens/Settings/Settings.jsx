@@ -42,83 +42,6 @@ function Settings() {
   const [userName, setUsername] = useState(displayName);
   const [loading, setLoading] = useState(false);
 
-  function updateUserInFirebase(downloadURL) {
-    const userRef = doc(db, "users", auth.currentUser.uid);
-    updateDoc(userRef, {
-      image: downloadURL,
-    });
-  }
-
-  const uploadImageToFirebaseStorage = async (uri) => {
-    try {
-      setLoading(true);
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const myRef = await uploadBytesResumable(
-        ref(storage, `profilePictures/${auth.currentUser.uid}`),
-        blob
-      );
-
-      await getDownloadURL(myRef.ref)
-        .then((downloadURL) => {
-          updateUserInFirebase(downloadURL);
-          updateProfile(auth.currentUser, {
-            photoURL: downloadURL,
-          })
-            .then(() => {
-              setLoading(false);
-              alert("Profile Picture Updated!");
-            })
-            .catch((error) => {
-              console.log("Error updating profile picture");
-              setLoading(false);
-            });
-        })
-        .catch((error) => {
-          console.log(error);
-          setLoading(false);
-          Alert("Error Uploading Image, Please try again later");
-        });
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-      Alert("Error Uploading Image, Please try again later");
-    }
-  };
-
-  const openCamera = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Sorry, we need camera roll permissions to make this work!");
-    } else {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        let uri = result.assets[0].uri;
-        let uploadUri =
-          Platform.OS === "ios" ? uri.replace("file://", "") : uri;
-        uploadImageToFirebaseStorage(uploadUri);
-      }
-    }
-  };
-
-  function updateUsername() {
-    updateProfile(auth.currentUser, {
-      displayName: userName,
-    })
-      .then(() => {
-        alert("Username Updated!");
-      })
-      .catch((error) => {
-        console.log("Error updating username");
-      });
-  }
-
   function changeColorTheme() {
     if (theme === "light") {
       dispatch(changeTheme("dark"));
@@ -202,32 +125,9 @@ function Settings() {
           value={unit === "imperial" ? false : true}
         />
       </View>
-      <View style={styles.settingsContainer}>
-        <Text style={theme === "light" ? styles.themeLight : styles.themeDark}>
-          Username
-        </Text>
-
-        <TextInput
-          style={styles.updateUsername}
-          onChangeText={(value) => {
-            setUsername(value);
-          }}
-          onSubmitEditing={updateUsername}
-        >
-          {userName}
-        </TextInput>
-      </View>
-      <View style={styles.settingsContainer}>
-        <Text style={theme === "light" ? styles.themeLight : styles.themeDark}>
-          Profile Picture
-        </Text>
-        <TouchableOpacity style={styles.updateButton} onPress={openCamera}>
-          <Text style={styles.updateText}>Update Image</Text>
-        </TouchableOpacity>
-      </View>
       <View style={styles.logoutButtonContainer}>
-        <TouchableOpacity style={styles.logoutButton} onPress={userSignOut}>
-          <Text style={styles.updateText}>Sign Out</Text>
+        <TouchableOpacity style={styles.updateButton}>
+          <Text style={styles.updateText}>Change Password</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -298,7 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.light.accent,
     borderRadius: 5,
     padding: 5,
-    width: 175,
+    width: "80%",
     height: 40,
     display: "flex",
     justifyContent: "center",

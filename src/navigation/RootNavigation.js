@@ -22,8 +22,7 @@ const RootNavigation = () => {
         tabBarStyle: {
           position: "absolute",
           bottom: 0,
-          backgroundColor:
-            theme == "light" ? colors.light.background : colors.dark.background,
+          backgroundColor: theme == "light" ? "#ffffff" : "#2c2f33",
           borderTopWidth: 0.25,
           borderTopColor: "grey",
         },

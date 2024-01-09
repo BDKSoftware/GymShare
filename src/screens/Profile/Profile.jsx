@@ -14,93 +14,112 @@ import { useSelector } from "react-redux";
 import colors from "../../../theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { useAuth } from "../../context/AuthContext";
+import NavigationButton from "./components/NavigationButton";
 
-//Components
-import PastWorkouts from "./components/PastWorkouts";
-import Stats from "./components/Stats";
+//External Functions
+import getUser from "../../utils/getUser";
 
 function Profile() {
   const navigation = useNavigation();
   const theme = useSelector((state) => state.theme.value);
+  const { logOut } = useAuth();
   const isFocused = useIsFocused();
 
   // State
-  const [view, setView] = useState("pw"); // pastWorkouts, Stats
+  const [user, setUser] = useState(null);
 
   const handleSettings = () => {
     navigation.navigate("Settings");
   };
 
+  function userSignOut() {
+    logOut();
+    navigation.navigate("Login");
+  }
+
+  async function getData() {
+    const user = await getUser(auth.currentUser.uid);
+    setUser(user);
+  }
+
   useEffect(() => {
-    if (isFocused) {
-      setView("pw");
-    }
+    getData();
   }, [isFocused]);
 
   return (
     <SafeAreaView
       style={theme === "light" ? styles.lightContainer : styles.darkContainer}
     >
-      <View style={styles.settingsContainer}>
-        <Pressable onPress={handleSettings}>
+      <View style={styles.logoutContainer}>
+        <TouchableOpacity onPress={userSignOut}>
           <Ionicons
-            name="settings-sharp"
-            size={24}
-            color={colors.dark.accent}
-            contentFit="contain"
-            transition={1000}
+            name="log-out-outline"
+            size={30}
+            color={theme === "light" ? colors.light.accent : colors.dark.accent}
           />
-        </Pressable>
+        </TouchableOpacity>
       </View>
-      <View style={styles.userInfoContainer}>
-        <Image source={auth.currentUser.photoURL} style={styles.userImage} />
-        <View>
-          <Text
-            style={
-              theme === "light" ? styles.userNameLight : styles.userNameDark
-            }
-          >
-            {auth.currentUser.displayName}
-          </Text>
-          <Text
-            style={
-              theme === "light" ? styles.userEmailLight : styles.userEmailDark
-            }
-          >
-            TODO: ADD ADDRESS HERE
-          </Text>
-        </View>
-      </View>
-      <View style={styles.pastWorkoutContainer}>
-        <View
-          style={
-            theme === "light"
-              ? styles.switchButtonContainerLight
-              : styles.switchButtonContainerDark
-          }
+
+      <View style={styles.imageContainer}>
+        <Image source={auth.currentUser.photoURL} style={styles.image} />
+        <Text style={theme === "light" ? styles.name : styles.nameDark}>
+          {auth.currentUser.displayName}
+        </Text>
+        {user && (
+          <>
+            <View style={styles.infoView}>
+              <Ionicons
+                name="people-circle-sharp"
+                size={20}
+                color={colors.dark.accent}
+              />
+              <Text
+                style={styles.friendsText}
+              >{`${user?.friends.length} friends`}</Text>
+            </View>
+            <View style={styles.infoView}>
+              <Ionicons
+                name="location-sharp"
+                size={20}
+                color={colors.dark.accent}
+              />
+              <Text style={styles.gymText}>{user.homeGym.name}</Text>
+            </View>
+          </>
+        )}
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => {
+            navigation.navigate("EditProfile");
+          }}
         >
-          <TouchableOpacity
-            style={view === "pw" ? styles.active : styles.inactive}
-            onPress={() => setView("pw")}
-          >
-            <Text
-              style={view === "pw" ? styles.activeText : styles.inactiveText}
-            >
-              Past Workouts
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={view === "stats" ? styles.active : styles.inactive}
-            onPress={() => setView("stats")}
-          >
-            <Text
-              style={view === "stats" ? styles.activeText : styles.inactiveText}
-            >
-              My Statistics
-            </Text>
-          </TouchableOpacity>
-        </View>
-        {view === "pw" ? <PastWorkouts /> : <Stats />}
+          <Text style={styles.editButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+      </View>
+      <View
+        style={
+          theme === "light"
+            ? styles.navigationContainer
+            : styles.navigationContainerDark
+        }
+      >
+        <NavigationButton
+          icon="calendar-outline"
+          text="Past Workouts"
+          onPress={() => {}}
+        />
+        <NavigationButton
+          icon="barbell-sharp"
+          text="Find My Gym"
+          onPress={() => navigation.navigate("AddGym")}
+        />
+
+        <NavigationButton
+          icon="settings-sharp"
+          text="Settings"
+          onPress={handleSettings}
+        />
       </View>
     </SafeAreaView>
   );
@@ -111,7 +130,7 @@ export default Profile;
 const styles = StyleSheet.create({
   lightContainer: {
     flex: 1,
-    backgroundColor: colors.light.background,
+    backgroundColor: "#f3f3f5",
   },
 
   darkContainer: {
@@ -119,145 +138,112 @@ const styles = StyleSheet.create({
     backgroundColor: colors.dark.background,
   },
 
-  settingsContainer: {
+  logoutContainer: {
+    width: "100%",
+    height: 50,
     display: "flex",
-    justifyContent: "center",
     alignItems: "flex-end",
+    justifyContent: "center",
+    paddingRight: 20,
+  },
+
+  imageContainer: {
     width: "100%",
-    height: "5%",
-    paddingHorizontal: 20,
-  },
-
-  userInfoContainer: {
+    height: "50%",
     display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-start",
     alignItems: "center",
-    width: "100%",
-    height: "15%",
-    padding: 10,
-  },
-
-  userImage: {
-    height: 100,
-    width: 100,
-    borderRadius: 50,
-    borderColor: colors.dark.accent,
-    borderWidth: 3,
-    marginRight: 30,
-  },
-
-  userNameLight: {
-    color: "#000",
-    fontSize: 24,
-  },
-
-  userNameDark: {
-    color: colors.dark.accent,
-    fontSize: 24,
-  },
-
-  userEmailLight: {
-    color: "#000",
-    fontSize: 16,
-  },
-
-  userEmailDark: {
-    color: colors.dark.accent,
-    fontSize: 16,
-  },
-  pastWorkoutContainer: {
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    width: "100%",
-    height: "80%",
-    padding: 10,
-  },
-
-  pastWorkoutTitleLight: {
-    fontSize: 20,
-    fontWeight: "bold",
-    alignSelf: "flex-start",
-  },
-
-  pastWorkoutTitleDark: {
-    fontSize: 20,
-    fontWeight: "bold",
-    alignSelf: "flex-start",
-    color: colors.dark.accent,
-  },
-
-  pastWorkouts: {
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    width: "100%",
-    height: "100%",
-    padding: 10,
-    marginTop: 10,
-  },
-
-  noWorkoutsLight: {
-    fontSize: 16,
-    color: "#000",
-  },
-
-  noWorkoutsDark: {
-    fontSize: 16,
-    color: colors.dark.accent,
-  },
-
-  switchButtonContainerLight: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "80%",
-    height: 40,
-    borderColor: colors.dark.accent,
-    borderWidth: 1,
-    borderRadius: 50,
-  },
-
-  switchButtonContainerDark: {
-    display: "flex",
-    flexDirection: "row",
     justifyContent: "space-evenly",
-    alignItems: "center",
-    width: "80%",
-    backgroundColor: "#48494b",
-    borderRadius: 50,
-    height: 40,
+    padding: 40,
   },
 
-  active: {
-    backgroundColor: colors.dark.accent,
-    width: "50%",
-    height: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 50,
+  image: {
+    width: 150,
+    height: 150,
+    borderRadius: 10,
   },
 
-  inactive: {
-    backgroundColor: "transparent",
-    width: "50%",
-    height: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 50,
+  name: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#000",
   },
 
-  activeText: {
+  nameDark: {
+    fontSize: 20,
+    fontWeight: "bold",
     color: "#fff",
-    fontSize: 16,
   },
 
-  inactiveText: {
-    color: colors.dark.accent,
+  friendsText: {
     fontSize: 16,
+    color: colors.dark.accent,
+    marginLeft: 10,
+  },
+
+  gymText: {
+    fontSize: 16,
+    color: colors.dark.accent,
+    marginLeft: 10,
+  },
+
+  editButton: {
+    width: "50%",
+    height: 30,
+    backgroundColor: colors.light.accent,
+    borderRadius: 10,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  editButtonDark: {
+    width: "40%",
+    height: 30,
+    borderColor: "#fff",
+    borderWidth: 1,
+    borderRadius: 10,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  editButtonText: {
+    fontSize: 16,
+    color: "#fff",
+  },
+
+  editButtonTextDark: {
+    fontSize: 16,
+    color: "#fff",
+  },
+
+  navigationContainer: {
+    width: "100%",
+    height: "50%",
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    backgroundColor: "#ffffff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+
+  navigationContainerDark: {
+    width: "100%",
+    height: "50%",
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    backgroundColor: "#2c2f33",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+
+  infoView: {
+    width: "80%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
   },
 });

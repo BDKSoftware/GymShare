@@ -65,6 +65,7 @@ function Home() {
         </TouchableOpacity>
       </View>
       <Text style={styles.title}>Past Workouts</Text>
+
       <ScrollView
         contentContainerStyle={{
           alignItems: "center",

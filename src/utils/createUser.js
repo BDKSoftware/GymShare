@@ -17,6 +17,7 @@ export default async function createUser(uid, name, email) {
     friends: [], // No friends to start with
     friendRequests: [], // No friend requests to start with
     visibility: "public", // Set visibility to public by default
+    homeGym: {}, // User can set this property in the Profile screen
   })
     .then(() => {
       console.log("User successfully created!");

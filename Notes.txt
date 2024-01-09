@@ -1,0 +1,7 @@
+Wednesday 1/9/23
+
+- Create a New gym page
+    - User Looks for gym via Google Places API call
+    - User selects gym
+    - Gym data is saved to Database for users nearby to users
+    - 
