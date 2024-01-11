@@ -91,6 +91,7 @@ function AddGym() {
                   style={
                     theme === "light" ? styles.gymName : styles.gymNameDark
                   }
+                  numberOfLines={1}
                 >
                   {gym.name}
                 </Text>
@@ -100,6 +101,7 @@ function AddGym() {
                       ? styles.gymAddress
                       : styles.gymAddressDark
                   }
+                  numberOfLines={1}
                 >
                   {gym.vicinity}
                 </Text>
@@ -187,7 +189,7 @@ const styles = StyleSheet.create({
 
   gymContainer: {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
     width: "100%",
@@ -202,18 +204,20 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
-    width: "90%",
+    width: "85%",
     height: "100%",
   },
 
   gymName: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#000",
+    fontWeight: "bold",
   },
 
   gymNameDark: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#fff",
+    fontWeight: "bold",
   },
 
   gymAddress: {

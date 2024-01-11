@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { TextInput } from "react-native-paper";
 
@@ -170,11 +171,13 @@ function EditProfile() {
       </Modal>
       <View style={styles.titleContainer}>
         <View style={styles.iconContainer}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={theme === "light" ? "#000" : "#fff"}
-          />
+          <Pressable onPress={() => navigation.goBack()}>
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={theme === "light" ? "#000" : "#fff"}
+            />
+          </Pressable>
         </View>
         <View style={styles.titleTextContainer}>
           <Text style={theme === "light" ? styles.title : styles.titleDark}>
