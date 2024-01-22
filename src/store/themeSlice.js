@@ -6,8 +6,7 @@ let initialState = Appearance.getColorScheme();
 const themeSlice = createSlice({
   name: "theme",
   initialState: {
-    value: initialState !== null ? initialState : "light",
-    // value: "light",
+    value: initialState !== null ? initialState : "dark",
   },
 
   reducers: {

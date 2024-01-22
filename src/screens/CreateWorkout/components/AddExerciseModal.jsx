@@ -65,6 +65,10 @@ function AddExerciseModal({
     ]);
   }
 
+  useEffect(() => {
+    console.log(sets);
+  }, [sets]);
+
   //   let set = {
   //     weight: "",
   //     reps: "",
@@ -86,22 +90,30 @@ function AddExerciseModal({
         })
       );
     }
+
+    async function deleteSet(index) {
+      if (sets.length === 1) return;
+      // Remove the set from the index, and change id's of the rest of the sets
+      let newSets = sets.filter((set) => set.id !== index + 1);
+      newSets = newSets.map((set, index) => {
+        set.id = index + 1;
+        return set;
+      });
+      setSets(newSets);
+    }
+
     return (
       <View style={styles.setContainer}>
-        <View style={styles.tableItem2}>
+        <View style={styles.indexContainer}>
           <Text
-            style={
-              theme === "light"
-                ? styles.tableHeadingText
-                : styles.tableHeadingTextDark
-            }
+            style={theme === "light" ? styles.setNumber : styles.setNumberDark}
           >
             {index + 1}
           </Text>
         </View>
-        <View style={styles.tableItem}>
+        <View style={styles.weightContainer}>
           <TextInput
-            style={theme === "light" ? styles.setInput : styles.setInputDark}
+            style={theme === "light" ? styles.formInput : styles.formInputDark}
             placeholderTextColor={theme === "light" ? "#000" : "#fff"}
             onBlur={() => handleUpdate()}
             onChangeText={(value) => setWeight(value)}
@@ -110,11 +122,15 @@ function AddExerciseModal({
             value={weight}
             placeholder="0"
           />
+          <Text
+            style={theme === "light" ? styles.unitText : styles.unitTextDark}
+          >
+            {unit === "imperial" ? "kg" : "lb"}
+          </Text>
         </View>
-
-        <View style={styles.tableItem}>
+        <View style={styles.repsContainer}>
           <TextInput
-            style={theme === "light" ? styles.setInput : styles.setInputDark}
+            style={theme === "light" ? styles.formInput : styles.formInputDark}
             placeholderTextColor={theme === "light" ? "#000" : "#fff"}
             onBlur={() => handleUpdate()}
             onChangeText={(value) => setReps(value)}
@@ -123,6 +139,16 @@ function AddExerciseModal({
             value={reps}
             placeholder="0"
           />
+          <Text
+            style={theme === "light" ? styles.unitText : styles.unitTextDark}
+          >
+            Reps
+          </Text>
+        </View>
+        <View style={styles.deleteContainer}>
+          <Pressable onPress={() => deleteSet(index)}>
+            <Feather name="x-circle" size={20} color={"red"} />
+          </Pressable>
         </View>
       </View>
     );
@@ -153,67 +179,42 @@ function AddExerciseModal({
               />
             </Pressable>
           </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Exercise Name"
-              style={theme === "light" ? styles.input : styles.inputDark}
-              placeholderTextColor={theme === "light" ? "#000" : "#fff"}
-              value={exerciseName}
-              onChangeText={(value) => setExerciseName(value)}
-            />
-          </View>
-          <View style={styles.tableHeading}>
-            <View style={styles.tableItem2}>
-              <Text
-                style={
-                  theme === "light"
-                    ? styles.tableHeadingText
-                    : styles.tableHeadingTextDark
-                }
-              >
-                Set
-              </Text>
-            </View>
-            <View style={styles.tableItem}>
-              <Text
-                style={
-                  theme === "light"
-                    ? styles.tableHeadingText
-                    : styles.tableHeadingTextDark
-                }
-              >
-                Weight
-              </Text>
-            </View>
-            <View style={styles.tableItem}>
-              <Text
-                style={
-                  theme === "light"
-                    ? styles.tableHeadingText
-                    : styles.tableHeadingTextDark
-                }
-              >
-                Reps
-              </Text>
-            </View>
-          </View>
-          <ScrollView
-            contentContainerStyle={{ paddingBottom: 50 }}
-            style={styles.scroll}
+          <View
+            style={theme === "light" ? styles.container : styles.containerDark}
           >
-            {sets.map((set, index) => {
-              return <SetContainer key={index} index={index} id={set.id} />;
-            })}
-          </ScrollView>
+            <View style={styles.titleContainer}>
+              <TextInput
+                placeholder="Enter Exercise Name"
+                value={exerciseName}
+                onChangeText={(value) => {
+                  setExerciseName(value);
+                }}
+                style={theme === "light" ? styles.input : styles.inputDark}
+                placeholderTextColor={
+                  theme === "light" ? "#000" : colors.dark.accent
+                }
+              />
+            </View>
+            <View style={styles.setsContainer}>
+              {sets.map((set, index) => {
+                return <SetContainer key={index} index={index} id={set.id} />;
+              })}
+              {sets.length < 12 && (
+                <View style={styles.addSetContainer}>
+                  <Pressable style={styles.addSet} onPress={() => addSet()}>
+                    <Feather name="plus" size={20} color={colors.dark.accent} />
+                    <Text style={styles.addSetText}>Add Set</Text>
+                  </Pressable>
+                </View>
+              )}
+            </View>
+          </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.addButton} onPress={() => addSet()}>
-              <Text style={styles.addButtonText}>Add Set </Text>
-            </TouchableOpacity>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => addExercise()}
             >
-              <Text style={styles.addButtonText}>Add Exercise </Text>
+              <Text style={styles.addButtonText}>Add Exercises</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: colors.dark.background,
     borderRadius: 20,
-    padding: 35,
+    padding: 15,
     alignItems: "center",
     shadowColor: "#000",
     width: "100%",
@@ -261,120 +262,32 @@ const styles = StyleSheet.create({
     height: "10%",
   },
 
-  inputContainer: {
-    width: "100%",
-    height: "5%",
-    marginBottom: 20,
-  },
-
-  input: {
-    width: "100%",
-    height: 50,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    borderBottomColor: "#000",
-    borderBottomWidth: 1,
-    color: "#000",
-  },
-
-  inputDark: {
-    width: "100%",
-    height: 50,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    borderBottomColor: colors.dark.accent,
-    borderBottomWidth: 1,
-    color: "#fff",
-  },
-
-  setContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "space-evenly",
-    flexDirection: "row",
-    height: 50,
-    width: "100%",
-  },
-
-  setInput: {
-    width: "100%",
-    height: 30,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    borderBottomColor: "#000",
-    borderBottomWidth: 1,
+  container: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    color: "#000",
-  },
-
-  setInputDark: {
     width: "100%",
-    height: 30,
+    height: "75%",
     borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    borderBottomColor: colors.dark.accent,
-    borderBottomWidth: 1,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    color: "#fff",
+    backgroundColor: "#fff",
   },
 
-  tableHeading: {
+  containerDark: {
     display: "flex",
-    justifyContent: "center",
-    alignItems: "space-evenly",
-    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
     width: "100%",
-    height: 50,
-  },
-
-  tableItem: {
-    width: "40%",
-    height: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  tableItem2: {
-    width: "20%",
-    height: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  tableHeadingText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-  },
-
-  tableHeadingTextDark: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-
-  scroll: {
-    width: "100%",
-    height: "50%",
+    height: "75%",
+    borderRadius: 10,
+    backgroundColor: "#2c2f33",
   },
 
   buttonContainer: {
     display: "flex",
-    justifyContent: "space-evenly",
+    justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    height: "15%",
-    marginTop: 20,
+    height: "10%",
   },
 
   addButton: {
@@ -382,16 +295,169 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    height: 40,
-    width: "100%",
+    height: 50,
+    width: "80%",
+    paddingHorizontal: 15,
+    marginVertical: 10,
     backgroundColor: colors.light.accent,
     borderRadius: 10,
   },
 
   addButtonText: {
-    color: "#fff",
     fontSize: 16,
-    marginLeft: 10,
-    fontWeight: "500",
+    fontWeight: "400",
+    color: colors.light.background,
+  },
+
+  titleContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    width: "100%",
+    height: "10%",
+    paddingHorizontal: 15,
+  },
+
+  inputDark: {
+    width: "100%",
+    height: 30,
+    backgroundColor: "#2c2f33",
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: "#fff",
+    borderBottomColor: colors.dark.accent,
+    borderBottomWidth: 1,
+  },
+
+  input: {
+    width: "100%",
+    height: 30,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: "#000",
+    borderBottomColor: colors.dark.accent,
+    borderBottomWidth: 1,
+  },
+
+  setsContainer: {
+    width: "100%",
+    height: "90%",
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+
+  setContainer: {
+    display: "flex",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    width: "100%",
+    height: 50,
+    paddingHorizontal: 15,
+    flexDirection: "row",
+  },
+
+  indexContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    width: "20%",
+    height: "100%",
+  },
+
+  setNumber: {
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#000",
+  },
+
+  setNumberDark: {
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#fff",
+  },
+
+  weightContainer: {
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexDirection: "row",
+    width: "30%",
+    height: "100%",
+    paddingHorizontal: 15,
+  },
+
+  formInput: {
+    height: 30,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    fontSize: 16,
+    color: "#000",
+  },
+
+  formInputDark: {
+    height: 30,
+    backgroundColor: "#2c2f33",
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    fontSize: 16,
+    color: "#fff",
+  },
+
+  unitText: {
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#000",
+  },
+
+  unitTextDark: {
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#fff",
+  },
+
+  repsContainer: {
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexDirection: "row",
+    width: "30%",
+    height: "100%",
+  },
+
+  addSetContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    width: "100%",
+    height: 50,
+    paddingHorizontal: 15,
+  },
+
+  addSet: {
+    display: "flex",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    flexDirection: "row",
+    width: "25%",
+    height: "100%",
+  },
+
+  addSetText: {
+    fontSize: 16,
+    fontWeight: "400",
+    color: colors.dark.accent,
+  },
+
+  deleteContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-end",
+    width: "10%",
+    height: "100%",
   },
 });

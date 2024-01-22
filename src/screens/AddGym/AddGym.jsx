@@ -45,7 +45,6 @@ function AddGym() {
 
   async function getData() {
     const user = await getUser(auth.currentUser.uid);
-    console.log("User", user);
     setSelectedGym(user.homeGym.place_id);
   }
 

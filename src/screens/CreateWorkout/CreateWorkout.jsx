@@ -23,6 +23,11 @@ import AddExerciseModal from "./components/AddExerciseModal";
 import { Ionicons } from "@expo/vector-icons";
 import { Foundation } from "@expo/vector-icons";
 
+//Functions
+import getUser from "../../utils/getUser";
+
+import { auth } from "../../../firebase";
+
 function CreateWorkout() {
   const theme = useSelector((state) => state.theme.value);
   const [workoutName, setWorkoutName] = useState("");
@@ -45,6 +50,15 @@ function CreateWorkout() {
     const newExercises = exercises.filter((exercise) => exercise.id !== id);
     setExercises(newExercises);
   }
+
+  async function getData() {
+    const user = await getUser(auth.currentUser.uid);
+    setGym(user.homeGym.name);
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <SafeAreaView
