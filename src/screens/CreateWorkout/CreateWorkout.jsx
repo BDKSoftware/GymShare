@@ -20,7 +20,7 @@ import colors from "../../../theme";
 import AddExerciseModal from "./components/AddExerciseModal";
 
 //Icons
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { Foundation } from "@expo/vector-icons";
 
 //Functions
@@ -42,7 +42,7 @@ function CreateWorkout() {
 
   useEffect(() => {
     if (exercises.length > 0) {
-      console.log(exercises);
+      console.log(exercises.sets);
     }
   }, [exercises]);
 
@@ -70,101 +70,104 @@ function CreateWorkout() {
         exercises={exercises}
         setExercises={setExercises}
       />
-      <View style={styles.goBackContainer}>
-        <Pressable onPress={goBack}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color={theme === "light" ? "#000" : colors.dark.accent}
-          />
-        </Pressable>
-      </View>
-      <TextInput
-        placeholder="Enter Gym Name"
-        value={gym}
-        onChangeText={(value) => {
-          setGym(value);
-        }}
-        style={theme === "light" ? styles.input : styles.inputDark}
-        placeholderTextColor={theme === "light" ? "#000" : colors.dark.accent}
-      />
-      <TextInput
-        placeholder="Enter Workout Name"
-        value={workoutName}
-        onChangeText={(value) => {
-          setWorkoutName(value);
-        }}
-        style={theme === "light" ? styles.input : styles.inputDark}
-        placeholderTextColor={theme === "light" ? "#000" : colors.dark.accent}
-      />
-
-      <TouchableOpacity
-        style={styles.addExerciseButton}
-        onPress={() => {
-          setIsVisable(true);
-        }}
-      >
-        <Foundation name="plus" size={16} color="white" />
-        <Text style={styles.addExerciseButtonText}>Add Exercise</Text>
-      </TouchableOpacity>
-      <Text
-        style={
-          theme === "light" ? styles.exercisesTitle : styles.exercisesTitleDark
-        }
-      >
-        Exercises:{" "}
-      </Text>
       <ScrollView
-        contentContainerStyle={{
-          alignItems: "center",
-          justifyContent: "flex-start",
-          paddingBottom: 100,
-        }}
-        style={styles.exerciseTable}
+        style={styles.scroll}
+        contentContainerStyle={{ paddingBottom: 150 }}
       >
-        {exercises.map((exercise, index) => {
-          return (
-            <View
-              key={index}
-              style={
-                theme === "light"
-                  ? styles.exerciseContainer
-                  : styles.exerciseContainerDark
-              }
-            >
-              <View style={styles.containerLeft}>
-                <Text
-                  style={
-                    theme === "light"
-                      ? styles.exerciseName
-                      : styles.exerciseNameDark
-                  }
-                >
-                  {exercise.name}
-                </Text>
-                <View style={styles.setsContainer}>
+        <View style={styles.goBackContainer}>
+          <Pressable onPress={goBack}>
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={theme === "light" ? "#000" : colors.dark.accent}
+            />
+          </Pressable>
+        </View>
+        <TextInput
+          placeholder="Enter Gym Name"
+          value={gym}
+          onChangeText={(value) => {
+            setGym(value);
+          }}
+          style={theme === "light" ? styles.input : styles.inputDark}
+          placeholderTextColor={theme === "light" ? "#000" : colors.dark.accent}
+        />
+        <TextInput
+          placeholder="Enter Workout Name"
+          value={workoutName}
+          onChangeText={(value) => {
+            setWorkoutName(value);
+          }}
+          style={theme === "light" ? styles.input : styles.inputDark}
+          placeholderTextColor={theme === "light" ? "#000" : colors.dark.accent}
+        />
+
+        <TouchableOpacity
+          style={styles.addExerciseButton}
+          onPress={() => {
+            setIsVisable(true);
+          }}
+        >
+          <Foundation name="plus" size={16} color="white" />
+          <Text style={styles.addExerciseButtonText}>Add Exercise</Text>
+        </TouchableOpacity>
+        <Text
+          style={
+            theme === "light"
+              ? styles.exercisesTitle
+              : styles.exercisesTitleDark
+          }
+        >
+          Exercises:{" "}
+        </Text>
+        <View style={styles.exerciseTable}>
+          {exercises.map((exercise, index) => {
+            return (
+              <View
+                key={index}
+                style={
+                  theme === "light"
+                    ? styles.exerciseContainer
+                    : styles.exerciseContainerDark
+                }
+              >
+                <View style={styles.containerLeft}>
                   <Text
+                    numberOfLines={1}
                     style={
-                      theme === "light" ? styles.setText : styles.setTextDark
-                    }
-                  >{`${exercise.sets.length} sets`}</Text>
-                  <Text
-                    style={
-                      theme === "light" ? styles.setText : styles.setTextDark
+                      theme === "light"
+                        ? styles.exerciseName
+                        : styles.exerciseNameDark
                     }
                   >
-                    TODO: ADD MORE DATA
+                    {exercise.name}
                   </Text>
                 </View>
+                <View style={styles.containerMiddle}>
+                  <Text
+                    style={
+                      theme === "light"
+                        ? styles.exerciseName
+                        : styles.exerciseNameDark
+                    }
+                  >
+                    {exercise.sets.length < 2
+                      ? "1 Set"
+                      : `${exercise.sets.length} Sets`}
+                  </Text>
+                </View>
+                <View style={styles.containerRight}>
+                  <Pressable onPress={() => removeExercise(exercise.id)}>
+                    <Feather name="x-circle" size={20} color="red" />
+                  </Pressable>
+                </View>
               </View>
-              <View style={styles.containerRight}>
-                <Pressable onPress={() => removeExercise(exercise.id)}>
-                  <Ionicons name="trash" size={24} color="red" />
-                </Pressable>
-              </View>
-            </View>
-          );
-        })}
+            );
+          })}
+        </View>
+        <TouchableOpacity style={styles.startExerciseButton}>
+          <Text style={styles.startExerciseButtonText}>Start Workout</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -196,6 +199,11 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "flex-start",
     alignItems: "center",
+  },
+
+  scroll: {
+    width: "100%",
+    height: "100%",
   },
 
   input: {
@@ -260,20 +268,21 @@ const styles = StyleSheet.create({
 
   exerciseTable: {
     width: "100%",
-    height: "50%",
+    height: "auto",
     display: "flex",
-
+    justifyContent: "flex-start",
+    alignItems: "center",
     marginTop: 20,
   },
 
   exerciseContainer: {
     width: "90%",
-    height: 100,
+    height: 50,
     display: "flex",
     justifyContent: "flex-start",
     alignItems: "flex-start",
     flexDirection: "row",
-    backgroundColor: colors.dark.background,
+    backgroundColor: "#fff",
     borderRadius: 10,
     marginBottom: 10,
     paddingHorizontal: 10,
@@ -282,12 +291,12 @@ const styles = StyleSheet.create({
 
   exerciseContainerDark: {
     width: "90%",
-    height: 100,
+    height: 50,
     display: "flex",
     justifyContent: "flex-start",
     alignItems: "flex-start",
     flexDirection: "row",
-    backgroundColor: colors.light.background,
+    backgroundColor: "#2c2f33",
     borderRadius: 10,
     marginBottom: 10,
     paddingHorizontal: 10,
@@ -295,15 +304,15 @@ const styles = StyleSheet.create({
   },
 
   exerciseName: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#000",
   },
 
   exerciseNameDark: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#000",
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#fff",
   },
 
   setsContainer: {
@@ -322,31 +331,61 @@ const styles = StyleSheet.create({
   },
 
   setText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
-    color: "#fff",
+    color: "#000",
   },
 
   setTextDark: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
-    color: "#000",
+    color: "#fff",
   },
 
   containerLeft: {
     display: "flex",
     justifyContent: "flex-start",
-    alignItems: "flex-start",
-    flexDirection: "column",
-    width: "80%",
+    alignItems: "center",
+    flexDirection: "row",
+    width: "50%",
+    height: "100%",
+  },
+
+  containerMiddle: {
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexDirection: "row",
+    width: "25%",
+    height: "100%",
   },
 
   containerRight: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "flex-end",
     flexDirection: "column",
-    width: "20%",
+    width: "25%",
     height: "100%",
+  },
+
+  startExerciseButton: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    height: 40,
+    width: "80%",
+    paddingHorizontal: 15,
+    backgroundColor: colors.light.accent,
+    borderRadius: 10,
+    alignSelf: "center",
+    marginTop: 20,
+  },
+
+  startExerciseButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });

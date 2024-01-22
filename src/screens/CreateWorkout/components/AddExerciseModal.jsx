@@ -42,6 +42,8 @@ function AddExerciseModal({
   }
 
   function addExercise() {
+    if (exerciseName === "") return alert("Please enter an exercise name");
+    if (sets.length === 0) return alert("Please enter at least one set");
     setExercises([
       ...exercises,
       {
@@ -103,7 +105,11 @@ function AddExerciseModal({
     }
 
     return (
-      <View style={styles.setContainer}>
+      <View
+        style={
+          theme === "light" ? styles.setContainer : styles.setContainerDark
+        }
+      >
         <View style={styles.indexContainer}>
           <Text
             style={theme === "light" ? styles.setNumber : styles.setNumberDark}
@@ -200,7 +206,13 @@ function AddExerciseModal({
                 return <SetContainer key={index} index={index} id={set.id} />;
               })}
               {sets.length < 12 && (
-                <View style={styles.addSetContainer}>
+                <View
+                  style={
+                    theme === "light"
+                      ? styles.addSetContainer
+                      : styles.addSetContainerDark
+                  }
+                >
                   <Pressable style={styles.addSet} onPress={() => addSet()}>
                     <Feather name="plus" size={20} color={colors.dark.accent} />
                     <Text style={styles.addSetText}>Add Set</Text>
@@ -358,6 +370,20 @@ const styles = StyleSheet.create({
     height: 50,
     paddingHorizontal: 15,
     flexDirection: "row",
+    borderTopColor: colors.light.background,
+    borderTopWidth: 1,
+  },
+
+  setContainerDark: {
+    display: "flex",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    width: "100%",
+    height: 50,
+    paddingHorizontal: 15,
+    flexDirection: "row",
+    borderTopColor: "#000",
+    borderTopWidth: 1,
   },
 
   indexContainer: {
@@ -436,6 +462,19 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 50,
     paddingHorizontal: 15,
+    borderTopColor: colors.light.background,
+    borderTopWidth: 1,
+  },
+
+  addSetContainerDark: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    width: "100%",
+    height: 50,
+    paddingHorizontal: 15,
+    borderTopColor: "#000",
+    borderTopWidth: 1,
   },
 
   addSet: {
