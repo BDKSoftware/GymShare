@@ -56,6 +56,20 @@ function CreateWorkout() {
     setGym(user.homeGym.name);
   }
 
+  async function handleNavigation() {
+    let workout = {
+      name: workoutName,
+      exercises: exercises,
+      gym: gym,
+    };
+
+    if (workoutName === "") return alert("Please enter a workout name");
+
+    if (exercises.length === 0) return alert("Please add an exercise");
+
+    navigation.navigate("StartWorkout", { workout: workout });
+  }
+
   useEffect(() => {
     getData();
   }, []);
@@ -165,7 +179,10 @@ function CreateWorkout() {
             );
           })}
         </View>
-        <TouchableOpacity style={styles.startExerciseButton}>
+        <TouchableOpacity
+          style={styles.startExerciseButton}
+          onPress={() => handleNavigation()}
+        >
           <Text style={styles.startExerciseButtonText}>Start Workout</Text>
         </TouchableOpacity>
       </ScrollView>

@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "../screens/Home/Home";
 import CreateWorkout from "../screens/CreateWorkout/CreateWorkout";
+import StartWorkout from "../screens/StartWorkout/StartWorkout";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ const HomeNavigation = () => {
     >
       <Stack.Screen name="HomeScreen" component={Home} />
       <Stack.Screen name="CreateWorkout" component={CreateWorkout} />
+      <Stack.Screen name="StartWorkout" component={StartWorkout} />
     </Stack.Navigator>
   );
 };
