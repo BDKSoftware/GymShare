@@ -25,8 +25,8 @@ function AddExerciseModal({
   const [sets, setSets] = useState([
     {
       id: 1,
-      weight: "",
-      reps: "",
+      weight: 0,
+      reps: 0,
     },
   ]);
 
@@ -35,8 +35,8 @@ function AddExerciseModal({
       ...sets,
       {
         id: sets.length + 1,
-        weight: "",
-        reps: "",
+        weight: 0,
+        reps: 0,
       },
     ]);
   }
@@ -61,8 +61,8 @@ function AddExerciseModal({
     setSets([
       {
         id: 1,
-        weight: "",
-        reps: "",
+        weight: 0,
+        reps: 0,
       },
     ]);
   }
