@@ -41,6 +41,8 @@ function Profile() {
   async function getData() {
     const user = await getUser(auth.currentUser.uid);
     setUser(user);
+    console.log(user);
+    return;
   }
 
   useEffect(() => {

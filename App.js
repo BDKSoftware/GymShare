@@ -5,6 +5,7 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import themeReducer from "./src/store/themeSlice";
 import unitSlice from "./src/store/unitSlice";
 import { AuthProvider } from "./src/context/AuthContext";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const reducer = combineReducers({
   theme: themeReducer,
@@ -17,7 +18,9 @@ export default function App() {
   return (
     <Provider store={store}>
       <AuthProvider>
-        <AuthNavigation />
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <AuthNavigation />
+        </GestureHandlerRootView>
       </AuthProvider>
     </Provider>
   );
