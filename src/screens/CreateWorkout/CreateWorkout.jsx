@@ -7,7 +7,7 @@ import {
   TextInput,
   Pressable,
   TouchableOpacity,
-  ScrollView,
+  FlatList,
 } from "react-native";
 // Hooks
 import { useSelector } from "react-redux";
@@ -28,42 +28,55 @@ import getUser from "../../utils/getUser";
 
 import { auth } from "../../../firebase";
 
-function CreateWorkout() {
-  const theme = useSelector((state) => state.theme.value);
-  const [workoutName, setWorkoutName] = useState("");
-  const [gym, setGym] = useState("");
-  const [exercises, setExercises] = useState([]);
-  const [isVisable, setIsVisable] = useState(false);
-  const navigation = useNavigation();
+//Data
+import { Months } from "../../data/Months";
+import ExerciseItem from "./components/ExerciseItem";
+import CreateExerciseModal from "./components/CreateExerciseModal";
 
-  function goBack() {
-    navigation.goBack();
+function CreateWorkout() {
+  const navigation = useNavigation();
+  const theme = useSelector((state) => state.theme.value);
+  const [name, setName] = useState("");
+  const [exercises, setExercises] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [addModal, setAddModal] = useState(false);
+  const [user, setUser] = useState(null);
+  const [gym, setGym] = useState("");
+
+  function getTodaysDate() {
+    const date = new Date();
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    let monthName = Months[month - 1];
+    return `${monthName} ${day}`;
   }
 
-  useEffect(() => {
-    if (exercises.length > 0) {
-      console.log(exercises.sets);
-    }
-  }, [exercises]);
-
-  function removeExercise(id) {
-    const newExercises = exercises.filter((exercise) => exercise.id !== id);
+  function updateExercise(exercise) {
+    let newExercises = exercises.map((item) => {
+      if (item.id === exercise.id) {
+        return exercise;
+      } else {
+        return item;
+      }
+    });
     setExercises(newExercises);
   }
 
-  async function getData() {
-    const user = await getUser(auth.currentUser.uid);
-    setGym(user.homeGym.name);
+  function addSet(exercise) {
+    const newSets = [...exercise.sets];
+    newSets.push({ reps: 0, weight: 0 });
+    const newExercise = { ...exercise, sets: newSets };
+    updateExercise(newExercise);
   }
 
   async function handleNavigation() {
     let workout = {
-      name: workoutName,
+      name: name,
       exercises: exercises,
       gym: gym,
     };
 
-    if (workoutName === "") return alert("Please enter a workout name");
+    if (name === "") return alert("Please enter a workout name");
 
     if (exercises.length === 0) return alert("Please add an exercise");
 
@@ -71,121 +84,96 @@ function CreateWorkout() {
   }
 
   useEffect(() => {
-    getData();
+    getUser(auth.currentUser.uid).then((user) => {
+      setUser(user);
+      setGym(user.homeGym.name);
+    });
   }, []);
+
+  useEffect(() => {
+    console.log(exercises);
+  }, [exercises]);
 
   return (
     <SafeAreaView
       style={theme === "light" ? styles.container : styles.darkContainer}
     >
       <AddExerciseModal
-        modalVisible={isVisable}
-        setModalVisible={setIsVisable}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        exercises={exercises}
+        setExercises={setExercises}
+        setAddModal={setAddModal}
+      />
+      <CreateExerciseModal
+        modalVisible={addModal}
+        setModalVisible={setAddModal}
         exercises={exercises}
         setExercises={setExercises}
       />
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={{ paddingBottom: 150 }}
-      >
-        <View style={styles.goBackContainer}>
-          <Pressable onPress={goBack}>
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color={theme === "light" ? "#000" : colors.dark.accent}
-            />
-          </Pressable>
-        </View>
-        <TextInput
-          placeholder="Enter Gym Name"
-          value={gym}
-          onChangeText={(value) => {
-            setGym(value);
-          }}
-          style={theme === "light" ? styles.input : styles.inputDark}
-          placeholderTextColor={theme === "light" ? "#000" : colors.dark.accent}
-        />
-        <TextInput
-          placeholder="Enter Workout Name"
-          value={workoutName}
-          onChangeText={(value) => {
-            setWorkoutName(value);
-          }}
-          style={theme === "light" ? styles.input : styles.inputDark}
-          placeholderTextColor={theme === "light" ? "#000" : colors.dark.accent}
-        />
+      <View style={styles.topArea}>
+        <Text style={styles.date}>{getTodaysDate()}</Text>
 
-        <TouchableOpacity
-          style={styles.addExerciseButton}
-          onPress={() => {
-            setIsVisable(true);
-          }}
-        >
-          <Foundation name="plus" size={16} color="white" />
-          <Text style={styles.addExerciseButtonText}>Add Exercise</Text>
-        </TouchableOpacity>
+        <Pressable onPress={handleNavigation}>
+          <Text style={styles.finishButton}>Finish</Text>
+        </Pressable>
+      </View>
+
+      <View
+        style={
+          theme === "light" ? styles.workoutDetails : styles.workoutDetailsDark
+        }
+      >
+        <TextInput
+          style={theme === "light" ? styles.input : styles.inputDark}
+          placeholder="Workout Name"
+          value={name}
+          onChangeText={(text) => setName(text)}
+          placeholderTextColor={theme === "light" ? "grey" : "whitesmoke"}
+        />
+      </View>
+
+      <Pressable
+        style={
+          theme === "light"
+            ? styles.addExerciseButton
+            : styles.addExerciseButtonDark
+        }
+        onPress={() => setModalVisible(true)}
+      >
         <Text
           style={
             theme === "light"
-              ? styles.exercisesTitle
-              : styles.exercisesTitleDark
+              ? styles.addExerciseText
+              : styles.addExerciseTextDark
           }
         >
-          Exercises:{" "}
+          Add Exercise
         </Text>
-        <View style={styles.exerciseTable}>
-          {exercises.map((exercise, index) => {
-            return (
-              <View
-                key={index}
-                style={
-                  theme === "light"
-                    ? styles.exerciseContainer
-                    : styles.exerciseContainerDark
-                }
-              >
-                <View style={styles.containerLeft}>
-                  <Text
-                    numberOfLines={1}
-                    style={
-                      theme === "light"
-                        ? styles.exerciseName
-                        : styles.exerciseNameDark
-                    }
-                  >
-                    {exercise.name}
-                  </Text>
-                </View>
-                <View style={styles.containerMiddle}>
-                  <Text
-                    style={
-                      theme === "light"
-                        ? styles.exerciseName
-                        : styles.exerciseNameDark
-                    }
-                  >
-                    {exercise.sets.length < 2
-                      ? "1 Set"
-                      : `${exercise.sets.length} Sets`}
-                  </Text>
-                </View>
-                <View style={styles.containerRight}>
-                  <Pressable onPress={() => removeExercise(exercise.id)}>
-                    <Feather name="x-circle" size={20} color="red" />
-                  </Pressable>
-                </View>
-              </View>
-            );
-          })}
-        </View>
-        <TouchableOpacity
-          style={styles.startExerciseButton}
-          onPress={() => handleNavigation()}
-        >
-          <Text style={styles.startExerciseButtonText}>Start Workout</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      </Pressable>
+
+      <FlatList
+        data={exercises}
+        keyExtractor={(item, index) => index.toString()}
+        style={{
+          width: "100%",
+          height: "60%",
+        }}
+        contentContainerStyle={{
+          paddingBottom: 100,
+        }}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => {
+          return (
+            <ExerciseItem
+              item={item}
+              theme={theme}
+              updateExercise={updateExercise}
+              addSet={addSet}
+            />
+          );
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -201,15 +189,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  goBackContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    height: "5%",
-    width: "100%",
-    padding: 10,
-  },
-
   darkContainer: {
     flex: 1,
     backgroundColor: colors.dark.background,
@@ -218,191 +197,107 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  scroll: {
+  topArea: {
     width: "100%",
-    height: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+  },
+
+  date: {
+    fontSize: 16,
+    fontWeight: "400",
+    color: colors.light.accent,
+  },
+
+  finishButton: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.light.accent,
+  },
+
+  workoutDetails: {
+    width: "95%",
+    height: 50,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "white",
+    marginBottom: 20,
+  },
+
+  workoutDetailsDark: {
+    width: "95%",
+    height: 50,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: "#2c2f33",
+    marginBottom: 20,
   },
 
   input: {
-    height: 40,
-    margin: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    padding: 10,
-    width: "90%",
-    color: "#000",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    borderBottomColor: "black",
   },
 
   inputDark: {
-    height: 40,
-    margin: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.dark.accent,
-    padding: 10,
-    width: "90%",
-    color: "#fff",
+    width: "100%",
+    height: "40%",
+    backgroundColor: "#2c2f33",
+    borderRadius: 10,
+    borderBottomColor: "black",
+    color: "white",
+  },
+
+  gymName: {
+    fontSize: 14,
+    fontWeight: "400",
+    color: colors.light.accent,
   },
 
   addExerciseButton: {
+    width: "95%",
+    height: 50,
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    height: 40,
-    width: "40%",
-    paddingHorizontal: 15,
-    marginVertical: 10,
-    backgroundColor: colors.light.accent,
+    alignItems: "flex-start",
+    padding: 10,
     borderRadius: 10,
-    alignSelf: "flex-start",
-    marginLeft: 20,
+    backgroundColor: "white",
+    marginBottom: 20,
   },
 
-  addExerciseButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    marginLeft: 10,
-    fontWeight: "500",
-  },
-
-  exercisesTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 20,
-    alignSelf: "flex-start",
-    marginLeft: 20,
-    color: colors.dark.background,
-  },
-
-  exercisesTitleDark: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 20,
-    alignSelf: "flex-start",
-    marginLeft: 20,
-    color: "#fff",
-  },
-
-  exerciseTable: {
-    width: "100%",
-    height: "auto",
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    marginTop: 20,
-  },
-
-  exerciseContainer: {
-    width: "90%",
+  addExerciseButtonDark: {
+    width: "95%",
     height: 50,
     display: "flex",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     alignItems: "flex-start",
-    flexDirection: "row",
-    backgroundColor: "#fff",
+    padding: 10,
     borderRadius: 10,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-  },
-
-  exerciseContainerDark: {
-    width: "90%",
-    height: 50,
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-    flexDirection: "row",
     backgroundColor: "#2c2f33",
-    borderRadius: 10,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+    marginBottom: 20,
   },
 
-  exerciseName: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#000",
-  },
-
-  exerciseNameDark: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#fff",
-  },
-
-  setsContainer: {
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-    flexDirection: "column",
-  },
-
-  setContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "column",
-    marginLeft: 10,
-  },
-
-  setText: {
+  addExerciseText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#000",
+    fontWeight: "700",
+    color: colors.light.accent,
   },
 
-  setTextDark: {
+  addExerciseTextDark: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
-  },
-
-  containerLeft: {
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    flexDirection: "row",
-    width: "50%",
-    height: "100%",
-  },
-
-  containerMiddle: {
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    flexDirection: "row",
-    width: "25%",
-    height: "100%",
-  },
-
-  containerRight: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-end",
-    flexDirection: "column",
-    width: "25%",
-    height: "100%",
-  },
-
-  startExerciseButton: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    height: 40,
-    width: "80%",
-    paddingHorizontal: 15,
-    backgroundColor: colors.light.accent,
-    borderRadius: 10,
-    alignSelf: "center",
-    marginTop: 20,
-  },
-
-  startExerciseButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "500",
+    fontWeight: "700",
+    color: colors.dark.accent,
   },
 });

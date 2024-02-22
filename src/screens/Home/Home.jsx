@@ -104,7 +104,7 @@ function Home() {
             {user.homeGym.name}
           </Text>
         )}
-        <Pressable>
+        <Pressable onPress={navigateToCreateWorkout}>
           <Ionicons name="add-circle" size={24} color={colors.dark.accent} />
         </Pressable>
       </View>

@@ -3,6 +3,7 @@ import Home from "../screens/Home/Home";
 import CreateWorkout from "../screens/CreateWorkout/CreateWorkout";
 import StartWorkout from "../screens/StartWorkout/StartWorkout";
 import EndWorkout from "../screens/EndWorkout/EndWorkout";
+import RootNavigation from "./RootNavigation";
 
 const Stack = createNativeStackNavigator();
 
