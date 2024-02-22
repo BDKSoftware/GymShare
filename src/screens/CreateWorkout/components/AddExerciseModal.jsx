@@ -21,6 +21,7 @@ function AddExerciseModal({
   exercises,
   setExercises,
   setAddModal,
+  setQrModal,
 }) {
   const theme = useSelector((state) => state.theme.value);
   const unit = useSelector((state) => state.unit.value);
@@ -39,7 +40,10 @@ function AddExerciseModal({
     >
       <SafeAreaView style={theme === "light" ? styles.modal : styles.modalDark}>
         <View style={styles.topArea}>
-          <Pressable style={styles.cancelButton}>
+          <Pressable
+            style={styles.cancelButton}
+            onPress={() => setModalVisible(false)}
+          >
             <Text style={styles.cancelButtonText} numberOfLines={1}>
               Cancel
             </Text>
@@ -56,7 +60,12 @@ function AddExerciseModal({
             >
               <Ionicons name="add-sharp" size={28} color={colors.dark.accent} />
             </Pressable>
-            <Pressable>
+            <Pressable
+              onPress={() => {
+                setQrModal(true);
+                setModalVisible(false);
+              }}
+            >
               <Ionicons name="qr-code" size={28} color={colors.dark.accent} />
             </Pressable>
           </View>

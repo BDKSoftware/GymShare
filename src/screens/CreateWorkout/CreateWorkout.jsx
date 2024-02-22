@@ -32,6 +32,7 @@ import { auth } from "../../../firebase";
 import { Months } from "../../data/Months";
 import ExerciseItem from "./components/ExerciseItem";
 import CreateExerciseModal from "./components/CreateExerciseModal";
+import ScanQR from "./components/ScanQR";
 
 function CreateWorkout() {
   const navigation = useNavigation();
@@ -40,6 +41,7 @@ function CreateWorkout() {
   const [exercises, setExercises] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [addModal, setAddModal] = useState(false);
+  const [qrModal, setQrModal] = useState(false);
   const [user, setUser] = useState(null);
   const [gym, setGym] = useState("");
 
@@ -104,6 +106,7 @@ function CreateWorkout() {
         exercises={exercises}
         setExercises={setExercises}
         setAddModal={setAddModal}
+        setQrModal={setQrModal}
       />
       <CreateExerciseModal
         modalVisible={addModal}
@@ -111,6 +114,14 @@ function CreateWorkout() {
         exercises={exercises}
         setExercises={setExercises}
       />
+
+      <ScanQR
+        modalVisible={qrModal}
+        setModalVisible={setQrModal}
+        exercises={exercises}
+        setExercises={setExercises}
+      />
+
       <View style={styles.topArea}>
         <Text style={styles.date}>{getTodaysDate()}</Text>
 
