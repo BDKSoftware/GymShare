@@ -195,13 +195,12 @@ const styles = StyleSheet.create({
   },
 
   listItem: {
-    width: "95%",
+    width: "100%",
     height: 50,
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
-    padding: 5,
-    margin: 10,
+    padding: 10,
     borderRadius: 10,
     backgroundColor: "white",
     borderBottomColor: "black",

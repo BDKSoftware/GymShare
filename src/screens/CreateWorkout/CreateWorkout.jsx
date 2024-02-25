@@ -29,7 +29,7 @@ import getUser from "../../utils/getUser";
 import { auth } from "../../../firebase";
 
 //Data
-import { Months } from "../../data/Months";
+import Months from "../../data/Months";
 import ExerciseItem from "./components/ExerciseItem";
 import CreateExerciseModal from "./components/CreateExerciseModal";
 import ScanQR from "./components/ScanQR";

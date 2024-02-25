@@ -99,14 +99,14 @@ function Home() {
       style={theme === "light" ? styles.lightContainer : styles.darkContainer}
     >
       <View style={styles.topBar}>
+        <Pressable onPress={navigateToCreateWorkout}>
+          <Ionicons name="add-circle" size={24} color={colors.dark.accent} />
+        </Pressable>
         {user && (
           <Text style={styles.gymName} numberOfLines={1}>
             {user.homeGym.name}
           </Text>
         )}
-        <Pressable onPress={navigateToCreateWorkout}>
-          <Ionicons name="add-circle" size={24} color={colors.dark.accent} />
-        </Pressable>
       </View>
       <View style={styles.titleContainer}>
         <Text style={theme === "light" ? styles.title : styles.titleDark}>

@@ -20,6 +20,7 @@ import { addDoc, doc, collection, updateDoc } from "firebase/firestore";
 import { Swipeable } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
+import Months from "../../data/Months";
 
 function StartWorkout(props) {
   const theme = useSelector((state) => state.theme.value);
@@ -30,6 +31,39 @@ function StartWorkout(props) {
   );
 
   const { gym, name } = props.route.params.workout;
+
+  function getStartTime() {
+    //Get Start time of when the screen mounts in format "Month Day, at Time"
+    let date = new Date();
+    let month = date.getMonth();
+    month = Months[month];
+    let day = date.getDate();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    let ampm = hours >= 12 ? "pm" : "am";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    let minutesString = minutes < 10 ? "0" + minutes : minutes;
+    let strTime =
+      month + " " + day + ", at " + hours + ":" + minutesString + " " + ampm;
+    return strTime;
+  }
+
+  function onDiscardPress() {
+    Alert.alert("Are you sure you want to discard this workout?", "", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      {
+        text: "Discard",
+        onPress: () => {
+          navigation.navigate("HomeScreen");
+        },
+      },
+    ]);
+  }
 
   function finishWorkout() {
     console.log("Workout Finished");
@@ -148,7 +182,13 @@ function StartWorkout(props) {
         )}
         friction={2}
       >
-        <Animated.View style={styles.renderItemContainer}>
+        <Animated.View
+          style={
+            theme === "light"
+              ? styles.renderItemContainer
+              : styles.renderItemContainerDark
+          }
+        >
           <Text>{item.name}</Text>
         </Animated.View>
       </Swipeable>
@@ -159,29 +199,52 @@ function StartWorkout(props) {
     <SafeAreaView
       style={theme === "light" ? styles.container : styles.darkContainer}
     >
-      <View style={styles.infoContainer}>
-        <Text
-          style={theme === "light" ? styles.infoText : styles.infoTextDark}
-        >{`Location: ${gym}`}</Text>
-        <Text
-          style={theme === "light" ? styles.infoText : styles.infoTextDark}
-        >{`Workout Name: ${name}`}</Text>
-      </View>
-      <View style={styles.titleContainer}>
+      <View style={styles.header}>
+        <View style={styles.discardButtonContainer}>
+          <Pressable onPress={onDiscardPress}>
+            <Text style={styles.headerButtonDiscard}>Discard</Text>
+          </Pressable>
+        </View>
         <Text style={theme === "light" ? styles.title : styles.titleDark}>
-          Exercises:{" "}
+          Workout
+        </Text>
+        <View style={styles.finishButtonContainer}>
+          <Pressable>
+            <Text style={styles.headerButton}>Finish</Text>
+          </Pressable>
+        </View>
+      </View>
+      <View
+        style={
+          theme === "light"
+            ? styles.workoutDataContainer
+            : styles.workoutDataContainerDark
+        }
+      >
+        <Text
+          style={
+            theme === "light" ? styles.workoutData : styles.workoutDataDark
+          }
+        >
+          {name}
+        </Text>
+        <View style={theme === "light" ? styles.line : styles.lineDark} />
+
+        <Text
+          style={
+            theme === "light" ? styles.workoutData : styles.workoutDataDark
+          }
+        >
+          {getStartTime()}
         </Text>
       </View>
-      <View style={{ height: "65%", width: "100%" }}>
+      <View style={{ width: "95%", height: "70%" }}>
         <FlatList
           data={exerciseList}
           renderItem={renderItem}
           keyExtractor={(item) => item.name}
-          ItemSeparatorComponent={() => <View style={{ marginBottom: 20 }} />}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         />
-      </View>
-      <View style={styles.buttonContainer}>
-        <EndWorkoutButton onPress={finishWorkout} />
       </View>
     </SafeAreaView>
   );
@@ -206,67 +269,113 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  infoContainer: {
-    width: "100%",
-    height: 100,
-
+  header: {
     display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "center",
-  },
-
-  infoTextDark: {
-    color: "white",
-    padding: 10,
-    fontWeight: "500",
-    fontSize: 16,
-  },
-
-  infoText: {
-    color: "black",
-    padding: 10,
-    fontWeight: "500",
-    fontSize: 16,
-  },
-
-  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     width: "100%",
-    height: 40,
-    display: "flex",
-    justifyContent: "flex-end",
+    height: 50,
+    padding: 10,
   },
 
   title: {
-    fontSize: 20,
-
     color: "black",
-    padding: 10,
+    fontWeight: "500",
+    fontSize: 15,
   },
 
   titleDark: {
-    fontSize: 20,
-
     color: "white",
-    padding: 10,
+    fontWeight: "500",
+    fontSize: 16,
   },
 
-  scroll: {
-    width: "100%",
-
-    height: 50,
+  headerButton: {
+    color: colors.light.accent,
+    fontWeight: "700",
   },
 
-  buttonContainer: {
-    width: "100%",
-    height: 100,
+  headerButtonDiscard: {
+    color: "red",
+    fontWeight: "600",
+  },
+
+  discardButtonContainer: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    width: "20%",
+  },
+
+  finishButtonContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "20%",
+  },
+
+  workoutDataContainer: {
+    display: "flex",
+    justifyContent: "space-evenly",
+    alignItems: "flex-start",
+    width: "95%",
+    height: 80,
+    backgroundColor: "white",
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+
+  workoutDataContainerDark: {
+    display: "flex",
+    justifyContent: "space-evenly",
+    alignItems: "flex-start",
+    width: "95%",
+    height: 80,
+    backgroundColor: "#2c2f33",
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+
+  workoutData: {
+    color: "black",
+    fontSize: 15,
+    paddingLeft: 5,
+  },
+
+  workoutDataDark: {
+    color: "white",
+    fontSize: 15,
+    paddingLeft: 5,
+  },
+
+  line: {
+    width: "98%",
+    height: 0.5,
+    backgroundColor: "lightgrey",
+    alignSelf: "center",
+  },
+
+  lineDark: {
+    width: "100%",
+    height: 0.5,
+    backgroundColor: "whitesmoke",
   },
 
   renderItemContainer: {
-    width: "100%",
-    height: 80,
+    width: "98%",
+    height: 50,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    backgroundColor: "white",
+    borderRadius: 10,
+  },
+
+  renderItemContainerDark: {
+    width: "98%",
+    height: 50,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
