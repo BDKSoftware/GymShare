@@ -8,21 +8,21 @@ import {
 import colors from "../../../theme";
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { auth } from "../../../firebase";
 
 function AuthLoading() {
   const navigation = useNavigation();
   const theme = useSelector((state) => state.theme.value);
 
   async function checkIfUserIsLoggedIn() {
-    const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
-
-    if (JSON.parse(isLoggedIn) === false) {
-      navigation.navigate("Login");
-      return;
-    }
-    navigation.navigate("Root");
-    return;
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigation.navigate("Root");
+      } else {
+        navigation.navigate("Login");
+      }
+    });
   }
 
   useEffect(() => {
