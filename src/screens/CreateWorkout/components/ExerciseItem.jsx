@@ -48,6 +48,9 @@ function ExerciseItem({ item, theme, updateExercise, addSet }) {
                     newSets[index].weight = text;
                     updateExercise(item.name, newSets);
                   }}
+                  placeholderTextColor={
+                    theme === "light" ? "lightgrey" : "whitesmoke"
+                  }
                 />
                 <Text
                   style={
@@ -68,6 +71,9 @@ function ExerciseItem({ item, theme, updateExercise, addSet }) {
                     newSets[index].reps = text;
                     updateExercise(item.name, newSets);
                   }}
+                  placeholderTextColor={
+                    theme === "light" ? "lightgrey" : "whitesmoke"
+                  }
                 />
                 <Text
                   style={

@@ -66,21 +66,35 @@ function CreateWorkout() {
 
   function addSet(exercise) {
     const newSets = [...exercise.sets];
-    newSets.push({ reps: 0, weight: 0 });
+    newSets.push({ reps: "", weight: "" });
     const newExercise = { ...exercise, sets: newSets };
     updateExercise(newExercise);
   }
 
   async function handleNavigation() {
+    if (name === "") return alert("Please enter a workout name");
+
+    if (exercises.length === 0) return alert("Please add an exercise");
+
+    // set every empty set to 0
+    let newExercises = exercises.map((exercise) => {
+      exercise.sets.map((set) => {
+        if (set.reps === "") {
+          set.reps = 0;
+        }
+        if (set.weight === "") {
+          set.weight = 0;
+        }
+        return set;
+      });
+      setExercises(newExercises);
+    });
+
     let workout = {
       name: name,
       exercises: exercises,
       gym: gym,
     };
-
-    if (name === "") return alert("Please enter a workout name");
-
-    if (exercises.length === 0) return alert("Please add an exercise");
 
     navigation.navigate("StartWorkout", { workout: workout });
   }

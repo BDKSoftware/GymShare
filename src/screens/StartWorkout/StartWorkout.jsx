@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,7 @@ import {
   Animated,
   Pressable,
   Alert,
+  Modal,
 } from "react-native";
 
 import { useSelector } from "react-redux";
@@ -20,7 +21,11 @@ import { addDoc, doc, collection, updateDoc } from "firebase/firestore";
 import { Swipeable } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Months from "../../data/Months";
+
+import ViewExerciseModal from "./components/ViewExerciseModal";
+import ChangeExerciseModal from "./components/ChangeExerciseModal";
 
 function StartWorkout(props) {
   const theme = useSelector((state) => state.theme.value);
@@ -28,6 +33,11 @@ function StartWorkout(props) {
   const navigation = useNavigation();
   const [exerciseList, setExerciseList] = useState(
     props.route.params.workout.exercises
+  );
+  const [changeModalVisible, setChangeModalVisible] = useState(false);
+  const [selectExerciseModal, setSelectExerciseModal] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState(
+    props.route.params.workout.exercises[0]
   );
 
   const { gym, name } = props.route.params.workout;
@@ -70,7 +80,7 @@ function StartWorkout(props) {
     let workout = {
       gym: gym,
       name: name,
-      exercises: exercises,
+      exercises: exerciseList,
       duration: Date.now() - startTime,
       creator: auth.currentUser.uid,
       id: "",
@@ -109,7 +119,9 @@ function StartWorkout(props) {
     ]);
   }
 
-  const RenderRightActions = ({ progress, dragX, exercise }) => {
+  const swipeableRef = useRef(null);
+
+  const RenderRightActions = ({ progress, dragX, exercise, swipeableRef }) => {
     const scale = dragX.interpolate({
       inputRange: [-100, 0],
       outputRange: [1, 0],
@@ -118,7 +130,15 @@ function StartWorkout(props) {
 
     return (
       <View style={styles.rightActionContainer}>
-        <Pressable style={styles.changeButton}>
+        <Pressable
+          style={styles.changeButton}
+          onPress={() => {
+            setSelectedExercise(exercise);
+            setChangeModalVisible(true);
+            console.log(exercise);
+            swipeableRef.current.close();
+          }}
+        >
           <Animated.View
             style={{
               color: "white",
@@ -141,8 +161,12 @@ function StartWorkout(props) {
           </Animated.Text>
         </Pressable>
         <Pressable
-          style={styles.deleteButton}
-          onPress={() => removeExercise(exercise)}
+          style={styles.viewButton}
+          onPress={() => {
+            setSelectedExercise(exercise);
+            setSelectExerciseModal(true);
+            swipeableRef.current.close();
+          }}
         >
           <Animated.View
             style={{
@@ -152,7 +176,11 @@ function StartWorkout(props) {
               display: "flex",
             }}
           >
-            <AntDesign name="delete" size={20} color="white" />
+            <MaterialCommunityIcons
+              name="view-headline"
+              size={20}
+              color="white"
+            />
           </Animated.View>
 
           <Animated.Text
@@ -163,7 +191,7 @@ function StartWorkout(props) {
               display: "flex",
             }}
           >
-            Delete
+            View
           </Animated.Text>
         </Pressable>
       </View>
@@ -171,16 +199,22 @@ function StartWorkout(props) {
   };
 
   const renderItem = ({ item }) => {
+    //Close swipeable on modal open
+
     return (
       <Swipeable
+        ref={swipeableRef}
         renderRightActions={(progress, dragX) => (
           <RenderRightActions
             progress={progress}
             dragX={dragX}
             exercise={item}
+            swipeableRef={swipeableRef}
           />
         )}
         friction={2}
+        rightThreshold={40}
+        overshootRight={false}
       >
         <Animated.View
           style={
@@ -189,7 +223,11 @@ function StartWorkout(props) {
               : styles.renderItemContainerDark
           }
         >
-          <Text>{item.name}</Text>
+          <Text
+            style={theme === "light" ? { color: "black" } : { color: "white" }}
+          >
+            {item.name}
+          </Text>
         </Animated.View>
       </Swipeable>
     );
@@ -199,6 +237,21 @@ function StartWorkout(props) {
     <SafeAreaView
       style={theme === "light" ? styles.container : styles.darkContainer}
     >
+      <ViewExerciseModal
+        exercise={selectedExercise}
+        modalVisible={selectExerciseModal}
+        setModalVisible={setSelectExerciseModal}
+        theme={theme}
+      />
+
+      <ChangeExerciseModal
+        modalVisible={changeModalVisible}
+        setModalVisible={setChangeModalVisible}
+        exercises={exerciseList}
+        setExercises={setExerciseList}
+        selectedExercise={selectedExercise}
+      />
+
       <View style={styles.header}>
         <View style={styles.discardButtonContainer}>
           <Pressable onPress={onDiscardPress}>
@@ -209,7 +262,7 @@ function StartWorkout(props) {
           Workout
         </Text>
         <View style={styles.finishButtonContainer}>
-          <Pressable>
+          <Pressable onPress={() => finishWorkout()}>
             <Text style={styles.headerButton}>Finish</Text>
           </Pressable>
         </View>
@@ -242,7 +295,7 @@ function StartWorkout(props) {
         <FlatList
           data={exerciseList}
           renderItem={renderItem}
-          keyExtractor={(item) => item.name}
+          keyExtractor={(item, index) => item.name + index}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         />
       </View>
@@ -324,6 +377,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
     marginBottom: 20,
+    paddingLeft: 10,
   },
 
   workoutDataContainerDark: {
@@ -335,6 +389,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#2c2f33",
     borderRadius: 10,
     marginBottom: 20,
+    paddingLeft: 10,
   },
 
   workoutData: {
@@ -407,11 +462,26 @@ const styles = StyleSheet.create({
   changeButton: {
     width: "48%",
     height: "100%",
-    backgroundColor: "green",
+    backgroundColor: colors.dark.accent,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
-    borderRadius: 10,
+    borderRadius: 5,
+    borderColor: "white",
+    borderWidth: 1,
+  },
+
+  viewButton: {
+    width: "48%",
+    height: "100%",
+    backgroundColor: colors.dark.accent,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+    borderRadius: 5,
+    borderColor: "white",
+    borderWidth: 1,
   },
 });

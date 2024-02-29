@@ -15,7 +15,7 @@ function AuthLoading() {
   const navigation = useNavigation();
   const theme = useSelector((state) => state.theme.value);
 
-  async function checkIfUserIsLoggedIn() {
+  function checkIfUserIsLoggedIn() {
     auth.onAuthStateChanged((user) => {
       if (user) {
         navigation.navigate("Root");
@@ -29,12 +29,12 @@ function AuthLoading() {
     checkIfUserIsLoggedIn();
     return () => {};
   }, []);
+
   return (
     <SafeAreaView
       style={theme === "light" ? styles.lightContainer : styles.darkContainer}
     >
       <ActivityIndicator size="large" color={colors.dark.accent} />
-      <Text>Loading...</Text>
     </SafeAreaView>
   );
 }
@@ -45,10 +45,16 @@ const styles = StyleSheet.create({
   darkContainer: {
     flex: 1,
     backgroundColor: colors.dark.background,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   lightContainer: {
     flex: 1,
     backgroundColor: colors.light.background,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
