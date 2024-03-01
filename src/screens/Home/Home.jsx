@@ -118,10 +118,12 @@ function Home() {
       </View>
       <FlatList
         style={{ width: "90%" }}
+        contentContainerStyle={{ paddingBottom: 100 }}
         data={pastWorkouts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <RenderItem item={item} theme={theme} />}
         ItemSeparatorComponent={() => <View style={{ marginVertical: 5 }} />}
+        showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );

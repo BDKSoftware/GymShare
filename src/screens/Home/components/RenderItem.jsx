@@ -1,15 +1,22 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const RenderItem = ({ item, theme }) => {
+  const navigation = useNavigation();
+
   function convertMillisecondsToTime(ms) {
     const minutes = Math.floor(ms / 60000);
     const seconds = ((ms % 60000) / 1000).toFixed(0);
     return `${minutes}m ${seconds < 10 ? "0" : ""}${seconds}s`;
   }
 
+  function navigateToViewWorkout() {
+    navigation.navigate("ViewWorkout", { workout: item });
+  }
+
   return (
-    <Pressable>
+    <Pressable onPress={navigateToViewWorkout}>
       <View style={theme === "light" ? styles.container : styles.containerDark}>
         <View style={styles.left}>
           <Text style={theme === "light" ? styles.title : styles.titleDark}>

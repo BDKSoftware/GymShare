@@ -4,6 +4,7 @@ import CreateWorkout from "../screens/CreateWorkout/CreateWorkout";
 import StartWorkout from "../screens/StartWorkout/StartWorkout";
 import EndWorkout from "../screens/EndWorkout/EndWorkout";
 import RootNavigation from "./RootNavigation";
+import ViewWorkout from "../screens/ViewWorkout/ViewWorkout";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ const HomeNavigation = () => {
       <Stack.Screen name="CreateWorkout" component={CreateWorkout} />
       <Stack.Screen name="StartWorkout" component={StartWorkout} />
       <Stack.Screen name="EndWorkout" component={EndWorkout} />
+      <Stack.Screen name="ViewWorkout" component={ViewWorkout} />
     </Stack.Navigator>
   );
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, ActivityIndicator } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
@@ -14,7 +14,7 @@ function Social() {
     <View
       style={theme === "light" ? styles.lightContainer : styles.darkContainer}
     >
-      <Text>Social</Text>
+      <ActivityIndicator size="large" color={colors.dark.accent} />
     </View>
   );
 }
