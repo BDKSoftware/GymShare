@@ -140,7 +140,7 @@ function CreateWorkout() {
         <Text style={styles.date}>{getTodaysDate()}</Text>
 
         <Pressable onPress={handleNavigation}>
-          <Text style={styles.finishButton}>Finish</Text>
+          <Text style={styles.finishButton}>Start Workout</Text>
         </Pressable>
       </View>
 

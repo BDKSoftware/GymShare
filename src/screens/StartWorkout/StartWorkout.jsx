@@ -263,7 +263,7 @@ function StartWorkout(props) {
         </Text>
         <View style={styles.finishButtonContainer}>
           <Pressable onPress={() => finishWorkout()}>
-            <Text style={styles.headerButton}>Finish</Text>
+            <Text style={styles.headerButton}>End Workout</Text>
           </Pressable>
         </View>
       </View>

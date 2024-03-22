@@ -20,7 +20,14 @@ const HomeNavigation = () => {
       <Stack.Screen name="HomeScreen" component={Home} />
       <Stack.Screen name="CreateWorkout" component={CreateWorkout} />
       <Stack.Screen name="StartWorkout" component={StartWorkout} />
-      <Stack.Screen name="EndWorkout" component={EndWorkout} />
+      <Stack.Screen
+        name="EndWorkout"
+        component={EndWorkout}
+        options={{
+          animation: "slide_from_left",
+          gestureEnabled: false,
+        }}
+      />
       <Stack.Screen name="ViewWorkout" component={ViewWorkout} />
     </Stack.Navigator>
   );
