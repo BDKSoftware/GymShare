@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Pressable, SafeAreaView } from "react-native";
 
 import colors from "../../../theme";
@@ -6,11 +6,14 @@ import { useSelector } from "react-redux";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { auth, db } from "../../../firebase";
+import getUser from "../../utils/getUser";
 
 function EndWorkout(props) {
   const { workout, id } = props.route.params;
   const theme = useSelector((state) => state.theme.value);
   const navigation = useNavigation();
+  const [user, setUser] = useState(null);
 
   const finishHandler = () => {
     navigation.navigate("HomeScreen");
@@ -23,6 +26,14 @@ function EndWorkout(props) {
   const currentDate = `${Months[date.getMonth()]} ${
     date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
   }`;
+
+  useEffect(() => {
+    if (user === null) {
+      getUser(auth.currentUser.uid).then((user) => setUser(user));
+    } else {
+      console.log(user);
+    }
+  }, [user]);
 
   return (
     <SafeAreaView
@@ -41,7 +52,17 @@ function EndWorkout(props) {
         </View>
       </View>
       <Text style={styles.text}>Workout Completed!</Text>
-      <View style={styles.dataContainer}></View>
+      <View style={styles.dataContainer}>
+        {user !== null && (
+          <>
+            <Text>{`You are currently on a ${user.streak} day workout streak! `}</Text>
+            <Text>{`Workout Duration: ${workout.duration}`}</Text>
+            <Pressable style={styles.addPhotoButton}>
+              <Text style={styles.addPhotoButtonText}>Add a photo</Text>
+            </Pressable>
+          </>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
@@ -130,7 +151,27 @@ const styles = StyleSheet.create({
   dataContainer: {
     height: "50%",
     width: "100%",
-    borderColor: "red",
-    borderWidth: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    padding: 10,
+  },
+
+  addPhotoButton: {
+    width: "80%",
+    height: 50,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.light.accent,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+
+  addPhotoButtonText: {
+    fontSize: 16,
+    color: "white",
+    fontWeight: "bold",
+    padding: 10,
   },
 });

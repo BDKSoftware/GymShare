@@ -15,17 +15,16 @@ import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 
 import colors from "../../../theme";
-import EndWorkoutButton from "./components/EndWorkoutButton";
 import { auth, db } from "../../../firebase";
 import { addDoc, doc, collection, updateDoc } from "firebase/firestore";
 import { Swipeable } from "react-native-gesture-handler";
-import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Months from "../../data/Months";
 
 import ViewExerciseModal from "./components/ViewExerciseModal";
 import ChangeExerciseModal from "./components/ChangeExerciseModal";
+import getUser from "../../utils/getUser";
 
 function StartWorkout(props) {
   const theme = useSelector((state) => state.theme.value);
@@ -75,8 +74,18 @@ function StartWorkout(props) {
     ]);
   }
 
-  function finishWorkout() {
+  async function updateStreak() {
+    let userRef = doc(db, "users", auth.currentUser.uid);
+    await getUser(auth.currentUser.uid).then(async (user) => {
+      await updateDoc(userRef, {
+        streak: user.streak + 1,
+      }).then(() => console.log("Streak Updated"));
+    });
+  }
+
+  async function finishWorkout() {
     console.log("Workout Finished");
+
     let workout = {
       gym: gym,
       name: name,
@@ -89,13 +98,14 @@ function StartWorkout(props) {
 
     let workoutRef = collection(db, "workouts");
 
-    addDoc(workoutRef, workout).then((docRef) => {
+    await addDoc(workoutRef, workout).then(async (docRef) => {
       console.log("Document written with ID: ", docRef.id);
-      updateDoc(docRef, { id: docRef.id });
+      await updateDoc(docRef, { id: docRef.id });
       navigation.navigate("EndWorkout", {
         workout: workout,
         id: docRef.id,
       });
+      updateStreak();
     });
   }
 
@@ -130,36 +140,6 @@ function StartWorkout(props) {
 
     return (
       <View style={styles.rightActionContainer}>
-        <Pressable
-          style={styles.changeButton}
-          onPress={() => {
-            setSelectedExercise(exercise);
-            setChangeModalVisible(true);
-            console.log(exercise);
-            swipeableRef.current.close();
-          }}
-        >
-          <Animated.View
-            style={{
-              color: "white",
-              fontWeight: "600",
-              transform: [{ scale }],
-              display: "flex",
-            }}
-          >
-            <FontAwesome name="exchange" size={20} color="white" />
-          </Animated.View>
-          <Animated.Text
-            style={{
-              color: "white",
-              fontWeight: "600",
-              transform: [{ scale }],
-              display: "flex",
-            }}
-          >
-            Change
-          </Animated.Text>
-        </Pressable>
         <Pressable
           style={styles.viewButton}
           onPress={() => {
@@ -198,6 +178,49 @@ function StartWorkout(props) {
     );
   };
 
+  const RenderLeftActions = ({ progress, dragX, exercise, swipeableRef }) => {
+    const scale = dragX.interpolate({
+      inputRange: [0, 100],
+      outputRange: [0, 1],
+      extrapolate: "clamp",
+    });
+
+    return (
+      <View style={styles.rightActionContainer}>
+        <Pressable
+          style={styles.changeButton}
+          onPress={() => {
+            setSelectedExercise(exercise);
+            setChangeModalVisible(true);
+            console.log(exercise);
+            swipeableRef.current.close();
+          }}
+        >
+          <Animated.View
+            style={{
+              color: "white",
+              fontWeight: "600",
+              transform: [{ scale }],
+              display: "flex",
+            }}
+          >
+            <FontAwesome name="exchange" size={20} color="white" />
+          </Animated.View>
+          <Animated.Text
+            style={{
+              color: "white",
+              fontWeight: "600",
+              transform: [{ scale }],
+              display: "flex",
+            }}
+          >
+            Change
+          </Animated.Text>
+        </Pressable>
+      </View>
+    );
+  };
+
   const renderItem = ({ item }) => {
     //Close swipeable on modal open
 
@@ -212,9 +235,19 @@ function StartWorkout(props) {
             swipeableRef={swipeableRef}
           />
         )}
+        renderLeftActions={(progress, dragX) => (
+          <RenderLeftActions
+            progress={progress}
+            dragX={dragX}
+            exercise={item}
+            swipeableRef={swipeableRef}
+          />
+        )}
         friction={2}
         rightThreshold={40}
+        leftThreshold={40}
         overshootRight={false}
+        overshootLeft={false}
       >
         <Animated.View
           style={
@@ -440,7 +473,7 @@ const styles = StyleSheet.create({
   },
 
   rightActionContainer: {
-    width: 200,
+    width: 80,
     height: "100%",
     display: "flex",
     justifyContent: "space-evenly",
@@ -460,7 +493,7 @@ const styles = StyleSheet.create({
   },
 
   changeButton: {
-    width: "48%",
+    width: "100%",
     height: "100%",
     backgroundColor: colors.dark.accent,
     display: "flex",
@@ -473,7 +506,7 @@ const styles = StyleSheet.create({
   },
 
   viewButton: {
-    width: "48%",
+    width: "100%",
     height: "100%",
     backgroundColor: colors.dark.accent,
     display: "flex",
