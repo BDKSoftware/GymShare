@@ -121,8 +121,8 @@ function AddExerciseModal({
                         group: exerciseGroup,
                         sets: [
                           {
-                            reps: 0,
-                            weight: 0,
+                            reps: "",
+                            weight: "",
                           },
                         ],
                       },

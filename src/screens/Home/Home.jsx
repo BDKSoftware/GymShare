@@ -35,10 +35,6 @@ function Home() {
     return;
   }
 
-  useEffect(() => {
-    getData();
-  }, [isFocused]);
-
   const getMinutes = (ms) =>
     ("0" + Math.floor((ms / 60 / 1000) % 60)).slice(-2);
   const getSeconds = (ms) => ("0" + Math.floor((ms / 1000) % 60)).slice(-2);
@@ -61,38 +57,49 @@ function Home() {
     navigation.navigate("CreateWorkout");
   }
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
+  function handleGymSelect() {
+    navigation.navigate("Profile", {
+      screen: "AddGym",
+      initial: false,
+    });
+  }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+  // useEffect(() => {
+  //   getData();
+  // }, [isFocused]);
 
-      return () => {};
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     let { status } = await Location.requestForegroundPermissionsAsync();
+  //     if (status !== "granted") {
+  //       setErrorMsg("Permission to access location was denied");
+  //       return;
+  //     }
 
-  useEffect(() => {
-    console.log(location);
-    if (location !== null) {
-      let coords = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      };
-      AsyncStorage.setItem("userLocation", JSON.stringify(coords));
-    }
-    return () => {};
-  }, [location]);
+  //     let location = await Location.getCurrentPositionAsync({});
+  //     setLocation(location);
 
-  useEffect(() => {
-    if (pastWorkouts.length === 0 && auth.currentUser !== null) {
-      getPastWorkouts();
-    }
-  }, []);
+  //     return () => {};
+  //   })();
+  // }, []);
+
+  // useEffect(() => {
+  //   console.log(location);
+  //   if (location !== null) {
+  //     let coords = {
+  //       latitude: location.coords.latitude,
+  //       longitude: location.coords.longitude,
+  //     };
+  //     AsyncStorage.setItem("userLocation", JSON.stringify(coords));
+  //   }
+  //   return () => {};
+  // }, [location]);
+
+  // useEffect(() => {
+  //   if (pastWorkouts.length === 0 && auth.currentUser !== null) {
+  //     getPastWorkouts();
+  //   }
+  // }, []);
 
   return (
     <SafeAreaView
@@ -102,10 +109,14 @@ function Home() {
         <Pressable onPress={navigateToCreateWorkout}>
           <Ionicons name="add-circle" size={24} color={colors.dark.accent} />
         </Pressable>
-        {user && (
+        {user !== null ? (
           <Text style={styles.gymName} numberOfLines={1}>
             {user.homeGym.name}
           </Text>
+        ) : (
+          <Pressable onPress={handleGymSelect}>
+            <Text style={styles.noGymText}>Select Your Gym</Text>
+          </Pressable>
         )}
       </View>
       <View style={styles.titleContainer}>
@@ -116,15 +127,24 @@ function Home() {
           style={theme === "light" ? styles.title2 : styles.title2Dark}
         >{`${pastWorkouts.length} Workouts`}</Text>
       </View>
-      <FlatList
-        style={{ width: "90%" }}
-        contentContainerStyle={{ paddingBottom: 100 }}
-        data={pastWorkouts}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <RenderItem item={item} theme={theme} />}
-        ItemSeparatorComponent={() => <View style={{ marginVertical: 5 }} />}
-        showsVerticalScrollIndicator={false}
-      />
+      {pastWorkouts.length > 0 ? (
+        <FlatList
+          style={{ width: "90%" }}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          data={pastWorkouts}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <RenderItem item={item} theme={theme} />}
+          ItemSeparatorComponent={() => <View style={{ marginVertical: 5 }} />}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <View style={styles.noWorkoutContainer}>
+          <Text style={styles.noWorkoutText}>No Workouts Found</Text>
+          <Text style={styles.noWorkoutText}>
+            Start by adding a new workout!
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -195,5 +215,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#8e8d93",
     fontWeight: "bold",
+  },
+
+  noGymText: {
+    fontSize: 14,
+    color: colors.dark.accent,
+    fontWeight: "800",
+    textDecorationLine: "underline",
+  },
+
+  noWorkoutContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "40%",
+  },
+
+  noWorkoutText: {
+    fontSize: 14,
+    color: colors.dark.accent,
+    fontWeight: "800",
   },
 });

@@ -79,6 +79,7 @@ function Login() {
           value={email}
           secureTextEntry={false}
           onFocus={() => setError(false)}
+          textContentType={"emailAddress"}
         />
         <AuthInput
           theme={theme}
@@ -87,6 +88,7 @@ function Login() {
           value={password}
           secureTextEntry={true}
           onFocus={() => setError(false)}
+          textContentType={"oneTimeCode"}
         />
         <View style={styles.forgotPasswordContainer}>
           <TouchableOpacity onPress={onClickForgotPassword}>

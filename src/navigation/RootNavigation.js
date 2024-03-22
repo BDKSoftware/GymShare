@@ -32,7 +32,7 @@ const RootNavigation = () => {
         name="Social"
         component={Social}
         options={{
-          // unmountOnBlur: true,
+          unmountOnBlur: true,
           gestureEnabled: false,
           fullScreenGestureEnabled: false,
           tabBarIcon: ({ color }) => (
@@ -47,7 +47,7 @@ const RootNavigation = () => {
         name="Home"
         component={HomeNavigation}
         options={{
-          // unmountOnBlur: true,
+          unmountOnBlur: true,
           gestureEnabled: false,
           fullScreenGestureEnabled: false,
           tabBarIcon: ({ color }) => (
@@ -62,7 +62,7 @@ const RootNavigation = () => {
         name="Profile"
         component={ProfileNavigation}
         options={{
-          // unmountOnBlur: true,
+          unmountOnBlur: true,
           gestureEnabled: false,
           fullScreenGestureEnabled: false,
           tabBarIcon: ({ color }) => (
