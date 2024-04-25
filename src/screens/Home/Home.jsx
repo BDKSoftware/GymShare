@@ -40,17 +40,29 @@ function Home() {
   const getSeconds = (ms) => ("0" + Math.floor((ms / 1000) % 60)).slice(-2);
   const formatTime = (ms) => `${getMinutes(ms)}m ${getSeconds(ms)}s`;
 
-  function getPastWorkouts() {
+  async function getPastWorkouts() {
     const q = query(
       collection(db, "workouts"),
       where("creator", "==", auth.currentUser.uid)
     );
 
-    getDocs(q).then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        setPastWorkouts((pastWorkouts) => [...pastWorkouts, doc.data()]);
-      });
+    // getDocs(q).then((querySnapshot) => {
+    //   querySnapshot.forEach((doc) => {
+    //     setPastWorkouts((pastWorkouts) => [...pastWorkouts, doc.data()]);
+    //   });
+    // });
+
+    let workouts = [];
+    let workoutSnapshots = await getDocs(q);
+
+    workoutSnapshots.forEach((doc) => {
+      // Get all workouts in the past week
+      if (doc.data().date >= Date.now() - 604800000) {
+        workouts.push(doc.data());
+      }
     });
+
+    setPastWorkouts(workouts);
   }
 
   function navigateToCreateWorkout() {
@@ -64,42 +76,42 @@ function Home() {
     });
   }
 
-  // useEffect(() => {
-  //   getData();
-  // }, [isFocused]);
+  useEffect(() => {
+    getData();
+  }, [isFocused]);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     let { status } = await Location.requestForegroundPermissionsAsync();
-  //     if (status !== "granted") {
-  //       setErrorMsg("Permission to access location was denied");
-  //       return;
-  //     }
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
 
-  //     let location = await Location.getCurrentPositionAsync({});
-  //     setLocation(location);
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
 
-  //     return () => {};
-  //   })();
-  // }, []);
+      return () => {};
+    })();
+  }, []);
 
-  // useEffect(() => {
-  //   console.log(location);
-  //   if (location !== null) {
-  //     let coords = {
-  //       latitude: location.coords.latitude,
-  //       longitude: location.coords.longitude,
-  //     };
-  //     AsyncStorage.setItem("userLocation", JSON.stringify(coords));
-  //   }
-  //   return () => {};
-  // }, [location]);
+  useEffect(() => {
+    console.log(location);
+    if (location !== null) {
+      let coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      AsyncStorage.setItem("userLocation", JSON.stringify(coords));
+    }
+    return () => {};
+  }, [location]);
 
-  // useEffect(() => {
-  //   if (pastWorkouts.length === 0 && auth.currentUser !== null) {
-  //     getPastWorkouts();
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (pastWorkouts.length === 0 && auth.currentUser !== null) {
+      getPastWorkouts();
+    }
+  }, []);
 
   return (
     <SafeAreaView
@@ -121,7 +133,7 @@ function Home() {
       </View>
       <View style={styles.titleContainer}>
         <Text style={theme === "light" ? styles.title : styles.titleDark}>
-          Past Workouts:{" "}
+          Past 7 Days:
         </Text>
         <Text
           style={theme === "light" ? styles.title2 : styles.title2Dark}

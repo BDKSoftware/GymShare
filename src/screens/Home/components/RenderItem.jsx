@@ -5,10 +5,11 @@ import { useNavigation } from "@react-navigation/native";
 const RenderItem = ({ item, theme }) => {
   const navigation = useNavigation();
 
-  function convertMillisecondsToTime(ms) {
-    const minutes = Math.floor(ms / 60000);
-    const seconds = ((ms % 60000) / 1000).toFixed(0);
-    return `${minutes}m ${seconds < 10 ? "0" : ""}${seconds}s`;
+  function convertSecondsToTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const newSeconds = Math.floor(seconds % 60);
+
+    return `${minutes}m ${newSeconds < 10 ? "0" : ""}${newSeconds}s`;
   }
 
   function navigateToViewWorkout() {
@@ -35,7 +36,7 @@ const RenderItem = ({ item, theme }) => {
         </View>
         <View style={styles.right}>
           <Text style={styles.rightItem}>
-            {convertMillisecondsToTime(item.duration)}
+            {convertSecondsToTime(item.duration)}
           </Text>
         </View>
       </View>

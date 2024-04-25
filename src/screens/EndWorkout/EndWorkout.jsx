@@ -56,7 +56,6 @@ function EndWorkout(props) {
         {user !== null && (
           <>
             <Text>{`You are currently on a ${user.streak} day workout streak! `}</Text>
-            <Text>{`Workout Duration: ${workout.duration}`}</Text>
             <Pressable style={styles.addPhotoButton}>
               <Text style={styles.addPhotoButtonText}>Add a photo</Text>
             </Pressable>

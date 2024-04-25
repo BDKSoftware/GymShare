@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import { db } from "../../firebase";
 import {
   updateDoc,
@@ -53,7 +54,7 @@ export default async function saveHomeGym(uuid, gym) {
     homeGym: userGym,
   })
     .then(() => {
-      console.log("Home gym successfully saved!");
+      Alert.alert("Home gym successfully saved!");
     })
     .catch((error) => {
       console.error("Error saving home gym: ", error);

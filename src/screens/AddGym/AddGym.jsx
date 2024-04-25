@@ -8,6 +8,7 @@ import {
   ScrollView,
   FlatList,
   Pressable,
+  Alert,
 } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
@@ -23,10 +24,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { auth } from "../../../firebase";
 
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { current } from "@reduxjs/toolkit";
+
 function AddGym() {
   const navigation = useNavigation();
   const theme = useSelector((state) => state.theme.value);
-  const [localGyms, setLocalGyms] = useState([]);
+  const [startingGym, setStartingGym] = useState("No Gym Selected");
   const [selectedGym, setSelectedGym] = useState(null);
 
   async function getUserLocationFromStorage() {
@@ -35,101 +39,72 @@ function AddGym() {
     return JSON.parse(location);
   }
 
-  function selectGym(gym) {
-    setSelectedGym(gym.place_id);
-  }
-
-  function unselectGym(gym) {
-    setSelectedGym(null);
-  }
-
   async function getData() {
     const user = await getUser(auth.currentUser.uid);
-    setSelectedGym(user.homeGym.place_id);
+
+    setStartingGym(user.homeGym.name);
   }
 
   useEffect(() => {
     getData();
   }, []);
 
-  useEffect(() => {
-    getUserLocationFromStorage().then(async (location) => {
-      let gyms = await getNearbyGyms(location.latitude, location.longitude);
-      setLocalGyms(gyms);
-    });
-  }, []);
-
   return (
-    <SafeAreaView
-      style={theme === "light" ? styles.container : styles.darkContainer}
-    >
+    <SafeAreaView style={styles.container}>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Gyms In Your Area</Text>
+        <Text
+          style={styles.title}
+          numberOfLines={1}
+        >{`Current Gym:  ${startingGym}`}</Text>
       </View>
-      <View
-        style={{
-          height: "70%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <ScrollView
-          contentContainerStyle={{
-            alignItems: "flex-start",
-            justifyContent: "center",
-            paddingBottom: 100,
+
+      <View style={styles.searchContainer}>
+        <GooglePlacesAutocomplete
+          placeholder="Search"
+          onPress={(data, details = null) => {
+            setSelectedGym(details);
           }}
-          style={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          {localGyms.map((gym) => (
-            <View key={gym.place_id} style={styles.gymContainer}>
-              <View style={styles.gymInfoContainer}>
-                <Text
-                  style={
-                    theme === "light" ? styles.gymName : styles.gymNameDark
-                  }
-                  numberOfLines={1}
-                >
-                  {gym.name}
-                </Text>
-                <Text
-                  style={
-                    theme === "light"
-                      ? styles.gymAddress
-                      : styles.gymAddressDark
-                  }
-                  numberOfLines={1}
-                >
-                  {gym.vicinity}
-                </Text>
-              </View>
-              <View>
-                {selectedGym === gym.place_id ? (
-                  <Pressable onPress={() => unselectGym(gym)}>
-                    <Ionicons
-                      name="star-sharp"
-                      size={24}
-                      color={colors.dark.accent}
-                    />
-                  </Pressable>
-                ) : (
-                  <Pressable onPress={() => selectGym(gym)}>
-                    <Ionicons
-                      name="star-outline"
-                      size={24}
-                      color={colors.dark.accent}
-                    />
-                  </Pressable>
-                )}
-              </View>
-            </View>
-          ))}
-        </ScrollView>
+          query={{
+            key: "AIzaSyARolGi2KoKY1iFVwhGATk_UWHp2lrMmvo",
+            language: "en",
+          }}
+          numberOfLines={10}
+          autoFocus={true}
+          returnKeyType={"default"}
+          fetchDetails={true}
+          styles={{
+            container: {
+              width: "90%",
+            },
+          }}
+          GooglePlacesSearchQuery={{
+            rankby: "distance",
+            type: "gym",
+          }}
+          GoogleReverseGeocodingQuery={{
+            rankby: "distance",
+            type: "gym",
+          }}
+          enablePoweredByContainer={false}
+          nearbyPlacesAPI="GooglePlacesSearch"
+          style={{
+            container: {
+              width: "100%",
+              height: "100%",
+            },
+
+            textInput: {
+              borderRadius: 10,
+            },
+
+            row: {
+              borderRadius: 10,
+            },
+          }}
+        />
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
+        <Pressable
           style={styles.button}
           onPress={() => {
             if (selectedGym === null) {
@@ -137,18 +112,13 @@ function AddGym() {
               return;
             }
 
-            let gym = localGyms.find((gym) => gym.place_id === selectedGym);
-
-            saveHomeGym(auth.currentUser.uid, gym).then(() => {
+            saveHomeGym(auth.currentUser.uid, selectedGym).then(() => {
               navigation.navigate("User");
             });
           }}
         >
-          <Text style={styles.buttonText}>Save Home Gym</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Cannot find gym?</Text>
-        </TouchableOpacity>
+          <Text style={styles.buttonText}>Update Home Gym</Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -169,15 +139,29 @@ const styles = StyleSheet.create({
 
   titleContainer: {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
+    flexDirection: "row",
     marginTop: 20,
+    paddingHorizontal: 20,
   },
 
   title: {
-    fontSize: 20,
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#000",
+  },
+
+  title2: {
+    fontSize: 16,
     fontWeight: "bold",
-    color: colors.dark.accent,
+    color: colors.light.accent,
+  },
+
+  update: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "red",
   },
 
   scrollContainer: {
@@ -230,11 +214,13 @@ const styles = StyleSheet.create({
   },
 
   buttonContainer: {
+    position: "absolute",
+    bottom: 100,
     display: "flex",
     justifyContent: "space-evenly",
     alignItems: "center",
     width: "100%",
-    height: "15%",
+    height: "5%",
     marginTop: 20,
   },
 
@@ -252,5 +238,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
     fontWeight: "bold",
+  },
+
+  searchContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "40%",
+    marginTop: 20,
   },
 });

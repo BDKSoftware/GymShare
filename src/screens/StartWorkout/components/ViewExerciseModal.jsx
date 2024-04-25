@@ -13,7 +13,13 @@ import colors from "../../../../theme";
 import { useSelector } from "react-redux";
 
 export default function ViewExerciseModal(props) {
-  let { exercise, modalVisible, setModalVisible, theme } = props;
+  let {
+    exercise,
+    modalVisible,
+    setModalVisible,
+    theme,
+    setChangeModalVisible,
+  } = props;
   let unit = useSelector((state) => state.unit.value);
 
   function checkUnit() {
@@ -35,6 +41,14 @@ export default function ViewExerciseModal(props) {
     >
       <SafeAreaView style={theme === "light" ? styles.modal : styles.modalDark}>
         <View style={styles.topArea}>
+          <Pressable
+            onPress={() => {
+              setModalVisible(false);
+              setChangeModalVisible(true);
+            }}
+          >
+            <Text style={styles.changeButton}>Change</Text>
+          </Pressable>
           <Pressable onPress={() => setModalVisible(false)}>
             <Text style={styles.dismissButton}>Dismiss</Text>
           </Pressable>
@@ -129,17 +143,23 @@ const styles = StyleSheet.create({
   },
 
   topArea: {
-    justifyContent: "center",
-    alignItems: "flex-end",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
     width: "100%",
     height: 50,
-    paddingRight: 10,
+    paddingHorizontal: 10,
     marginBottom: 20,
   },
 
   dismissButton: {
     fontSize: 16,
     color: "red",
+  },
+
+  changeButton: {
+    fontSize: 16,
+    color: colors.light.accent,
   },
 
   container: {

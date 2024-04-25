@@ -3,7 +3,7 @@
     "name": "GymSmart",
     "slug": "gymsmart",
     "privacy": "public",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -33,7 +33,9 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow scanner.letstapin.com to access your camera."
+          "cameraPermission": "Allow GymSmart to access your camera",
+          "microphonePermission": "Allow GymSmart to access your microphone",
+          "recordAudioAndroid": true
         }
       ]
     ],
