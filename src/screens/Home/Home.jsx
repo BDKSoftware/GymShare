@@ -31,7 +31,6 @@ function Home() {
   async function getData() {
     const user = await getUser(auth.currentUser.uid);
     setUser(user);
-    console.log(user);
     return;
   }
 
@@ -96,7 +95,6 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    console.log(location);
     if (location !== null) {
       let coords = {
         latitude: location.coords.latitude,

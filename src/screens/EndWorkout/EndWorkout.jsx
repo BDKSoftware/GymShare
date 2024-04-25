@@ -1,22 +1,73 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Pressable, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  SafeAreaView,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 
 import colors from "../../../theme";
 import { useSelector } from "react-redux";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { auth, db } from "../../../firebase";
+import { auth, db, storage } from "../../../firebase";
 import getUser from "../../utils/getUser";
+import TakePhoto from "./components/TakePhoto";
+import { Camera, CameraType } from "expo-camera";
+import { uploadBytesResumable, ref, getDownloadURL } from "firebase/storage";
+import { updateDoc, doc } from "firebase/firestore";
 
 function EndWorkout(props) {
+  // Workout is the workout object
+  // ID is the workout ID in Firebase
   const { workout, id } = props.route.params;
   const theme = useSelector((state) => state.theme.value);
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
+  const [modal, setModal] = useState(false);
+  const [photo, setPhoto] = useState(null);
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [url, setUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    Camera.requestCameraPermissionsAsync();
+    console.log("workout", workout);
+  }, [permission]);
+
+  async function handleUpload() {
+    let data = await fetch(photo.uri);
+    let blob = await data.blob();
+
+    let storageRef = ref(storage, `workoutPhotos/${id}.jpg`);
+    await uploadBytesResumable(storageRef, blob).then(async (snapshot) => {
+      await getDownloadURL(snapshot.ref).then(async (downloadURL) => {
+        await addUrlToDoc(downloadURL);
+      });
+    });
+  }
+
+  async function addUrlToDoc(url) {
+    let docRef = doc(db, "workouts", id);
+    await updateDoc(docRef, {
+      photo: url,
+    });
+    setLoading(false);
+  }
 
   const finishHandler = () => {
-    navigation.navigate("HomeScreen");
+    if (photo !== null) {
+      setLoading(true);
+      handleUpload().then(() => {
+        navigation.navigate("HomeScreen");
+      });
+    } else {
+      navigation.navigate("HomeScreen");
+    }
   };
 
   //get current date
@@ -27,6 +78,12 @@ function EndWorkout(props) {
     date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
   }`;
 
+  function handleAddPhotoPress() {
+    if (permission.granted) {
+      setModal(true);
+    }
+  }
+
   useEffect(() => {
     if (user === null) {
       getUser(auth.currentUser.uid).then((user) => setUser(user));
@@ -35,35 +92,65 @@ function EndWorkout(props) {
     }
   }, [user]);
 
-  return (
-    <SafeAreaView
-      style={theme === "light" ? styles.container : styles.darkContainer}
-    >
-      <View style={styles.topArea}>
-        <Text style={styles.headerText}>{currentDate}</Text>
+  function Content() {
+    return (
+      <SafeAreaView
+        style={theme === "light" ? styles.container : styles.darkContainer}
+      >
+        <TakePhoto setPhoto={setPhoto} modal={modal} setModal={setModal} />
+        <View style={styles.topArea}>
+          <Text style={styles.headerText}>{currentDate}</Text>
 
-        <Pressable onPress={finishHandler}>
-          <Text style={styles.finish}>Finish</Text>
-        </Pressable>
-      </View>
-      <View style={styles.iconContainer}>
-        <View style={styles.circle}>
-          <Ionicons name="checkmark" size={25} color="white" />
+          <Pressable onPress={finishHandler}>
+            <Text style={styles.finish}>Finish</Text>
+          </Pressable>
         </View>
-      </View>
-      <Text style={styles.text}>Workout Completed!</Text>
-      <View style={styles.dataContainer}>
-        {user !== null && (
-          <>
-            <Text>{`You are currently on a ${user.streak} day workout streak! `}</Text>
-            <Pressable style={styles.addPhotoButton}>
+        <View style={styles.iconContainer}>
+          <View style={styles.circle}>
+            <Ionicons name="checkmark" size={25} color="white" />
+          </View>
+        </View>
+        <Text style={styles.text}>Workout Completed!</Text>
+        <View style={styles.dataContainer}>
+          {user !== null && (
+            <>
+              <Text>{`You are currently on a ${user.streak} day workout streak! `}</Text>
+            </>
+          )}
+          <Pressable
+            style={styles.addPhotoButton}
+            onPress={handleAddPhotoPress}
+          >
+            {photo == null ? (
               <Text style={styles.addPhotoButtonText}>Add a photo</Text>
-            </Pressable>
-          </>
-        )}
+            ) : (
+              <Text style={styles.addPhotoButtonText}>Retake Photo</Text>
+            )}
+          </Pressable>
+          {photo !== null && (
+            <>
+              <Image style={styles.photo} src={photo.uri} />
+            </>
+          )}
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  function ContentLoading() {
+    return (
+      <View
+        style={
+          theme === "light" ? styles.loadingStyles : styles.loadingStylesDark
+        }
+      >
+        <ActivityIndicator size={"large"} color={colors.dark.accent} />
+        <Text style={styles.loadingText}>Image Uploading</Text>
       </View>
-    </SafeAreaView>
-  );
+    );
+  }
+
+  return loading == false ? <Content /> : <ContentLoading />;
 }
 
 export default EndWorkout;
@@ -172,5 +259,38 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     padding: 10,
+  },
+
+  photo: {
+    marginTop: 50,
+    width: "90%",
+    height: "90%",
+    borderRadius: 10,
+    borderColor: colors.dark.accent,
+    borderWidth: 3,
+  },
+
+  loadingStyles: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  loadingStylesDark: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.dark.background,
+  },
+
+  loadingText: {
+    color: colors.dark.accent,
+    fontSize: 16,
+    fontWeight: "500",
+    marginTop: 20,
   },
 });
