@@ -34,14 +34,13 @@ function Profile() {
   };
 
   function userSignOut() {
-    logOut();
     navigation.navigate("Login");
+    logOut();
   }
 
   async function getData() {
     const user = await getUser(auth.currentUser.uid);
     setUser(user);
-    console.log(user);
     return;
   }
 
@@ -64,10 +63,15 @@ function Profile() {
       </View>
 
       <View style={styles.imageContainer}>
-        <Image source={auth.currentUser.photoURL} style={styles.image} />
-        <Text style={theme === "light" ? styles.name : styles.nameDark}>
-          {auth.currentUser.displayName}
-        </Text>
+        {auth.currentUser && (
+          <>
+            <Image source={auth.currentUser.photoURL} style={styles.image} />
+
+            <Text style={theme === "light" ? styles.name : styles.nameDark}>
+              {auth.currentUser.displayName}
+            </Text>
+          </>
+        )}
         {user && (
           <>
             <View style={styles.infoView}>
