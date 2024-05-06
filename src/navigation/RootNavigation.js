@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import colors from "../../theme";
 
 import HomeNavigation from "./HomeNavigation";
-import Social from "../screens/Social/Social";
+import SocialNavigation from "./SocialNavigation";
 import ProfileNavigation from "./ProfileNavigation";
 
 const Tabs = createBottomTabNavigator();
@@ -30,7 +30,7 @@ const RootNavigation = () => {
     >
       <Tabs.Screen
         name="Social"
-        component={Social}
+        component={SocialNavigation}
         options={{
           unmountOnBlur: true,
           gestureEnabled: false,
