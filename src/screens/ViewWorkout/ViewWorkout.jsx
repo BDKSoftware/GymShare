@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   View,
@@ -11,26 +11,66 @@ import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import colors from "../../../theme";
 import RenderItem from "./component/RenderItem";
+import getUser from "../../utils/getUser";
+import { auth } from "../../../firebase";
 
 const ViewWorkout = (props) => {
   let workout = props.route.params.workout;
-  let exercises = workout.exercises;
-  console.log(workout);
+
   const theme = useSelector((state) => state.theme.value);
   const navigation = useNavigation();
+  const [user, setUser] = useState(null);
+  const [gym, setGym] = useState("");
+  const [exercises, setExercises] = useState(
+    props.route.params.workout.exercises
+  );
+
+  useEffect(() => {
+    getUser(auth.currentUser.uid).then((user) => {
+      setUser(user);
+      setGym(user.homeGym.name);
+    });
+  }, []);
+
+  function handleTryWorkout() {
+    let newExercises = exercises.map((exercise) => {
+      exercise.sets.map((set) => {
+        if (set.reps === "") {
+          set.reps = 0;
+        }
+        if (set.weight === "") {
+          set.weight = 0;
+        }
+        return set;
+      });
+      setExercises(newExercises);
+    });
+
+    let copiedWorkout = {
+      workout: workout.name,
+      exercises: exercises,
+      gym: gym,
+    };
+
+    navigation.navigate("StartWorkout", { workout: copiedWorkout });
+  }
 
   return (
     <SafeAreaView
       style={theme === "light" ? styles.container : styles.darkContainer}
     >
       <View style={styles.topArea}>
-        <Text style={styles.text}>{workout.name}</Text>
         <Pressable
           onPress={() => {
-            navigation.goBack();
+            navigation.navigate("Home", {
+              screen: "HomeScreen",
+            });
           }}
         >
           <Text style={styles.dismiss}>Dismiss</Text>
+        </Pressable>
+        <Pressable onPress={handleTryWorkout}>
+          <Text style={styles.text}>Start Workout</Text>
         </Pressable>
       </View>
       <View style={styles.content}>

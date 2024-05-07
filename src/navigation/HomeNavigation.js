@@ -24,6 +24,7 @@ const HomeNavigation = () => {
         options={{
           animation: "slide_from_left",
           gestureEnabled: false,
+          unmoutOnBlur: true,
         }}
       />
       <Stack.Screen
@@ -34,7 +35,15 @@ const HomeNavigation = () => {
           gestureEnabled: false,
         }}
       />
-      <Stack.Screen name="ViewWorkout" component={ViewWorkout} />
+      <Stack.Screen
+        name="ViewWorkout"
+        component={ViewWorkout}
+        options={{
+          animation: "slide_from_left",
+          gestureEnabled: false,
+          unmoutOnBlur: true,
+        }}
+      />
     </Stack.Navigator>
   );
 };

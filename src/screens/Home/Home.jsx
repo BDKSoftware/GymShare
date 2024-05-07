@@ -133,9 +133,11 @@ function Home() {
         <Text style={theme === "light" ? styles.title : styles.titleDark}>
           Past 7 Days:
         </Text>
-        <Text
-          style={theme === "light" ? styles.title2 : styles.title2Dark}
-        >{`${pastWorkouts.length} Workouts`}</Text>
+        {pastWorkouts.length > 0 && (
+          <Text
+            style={theme === "light" ? styles.title2 : styles.title2Dark}
+          >{`${pastWorkouts.length} Workouts`}</Text>
+        )}
       </View>
       {pastWorkouts.length > 0 ? (
         <FlatList

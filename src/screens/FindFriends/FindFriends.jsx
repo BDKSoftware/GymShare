@@ -5,6 +5,7 @@ import {
   TextInput,
   View,
   FlatList,
+  Pressable,
 } from "react-native";
 import { Image } from "expo-image";
 import React, { useState, useEffect } from "react";
@@ -14,13 +15,15 @@ import colors from "../../../theme";
 import { FontAwesome } from "@expo/vector-icons";
 import { auth, db } from "../../../firebase";
 import { query, where, collection, getDocs } from "firebase/firestore";
+import filter from "lodash.filter";
 
 const FindFriends = () => {
   const navigation = useNavigation();
   const theme = useSelector((state) => state.theme.value);
-  const [users, setUsers] = useState([]);
+  const [data, setData] = useState([]);
+  const [fullData, setFullData] = useState([]);
 
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   async function getUsers() {
     let temp = [];
@@ -33,42 +36,67 @@ const FindFriends = () => {
       temp.push(doc.data());
     });
 
-    setUsers(temp);
+    setFullData(temp);
+    setData(temp);
   }
 
-  useEffect(() => {
-    let filteredUsers = users.filter((user) =>
-      user.name.toLowerCase().includes(search.toLocaleLowerCase())
-    );
-    setUsers(filteredUsers);
-  }, [search]);
+  function handleSearch(query) {
+    setSearchQuery(query);
+    const formattedQuery = query.toLowerCase();
+    const filteredData = filter(fullData, (user) => {
+      return contains(user, formattedQuery);
+    });
+    setData(filteredData);
+  }
+
+  function contains(user, query) {
+    let formattedName = user.name.toLowerCase();
+    if (formattedName.includes(query)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function handleUserPress(user) {
+    // navigation.navigate("User", {
+    //   params: { user: user },
+    // });
+    console.log("pressed");
+  }
 
   useEffect(() => {
     getUsers();
   }, []);
 
   function UserCard({ user }) {
-    let tempUser = user.item;
     return (
-      <View style={theme === "light" ? styles.userCard : styles.userCardDark}>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.profileImage}
-            source={{ uri: tempUser.image }}
-            alt={`${tempUser.name}'s profile picture`}
-          />
+      <Pressable onPress={(user) => handleUserPress(user)}>
+        <View style={styles.userCard}>
+          <View style={styles.imageContainer}>
+            <Image
+              style={styles.profileImage}
+              source={{ uri: user.image }}
+              alt={`${user.name}'s profile picture`}
+              contentFit="cover"
+              accessible={true}
+              cachePolicy="memory-disk"
+            />
+          </View>
+          <View style={styles.userInfo}>
+            <Text
+              style={theme === "light" ? styles.userName : styles.userNameDark}
+            >
+              {user.name}
+            </Text>
+            <Text
+              style={theme === "light" ? styles.userGym : styles.userGymDark}
+            >
+              {user.homeGym.name}
+            </Text>
+          </View>
         </View>
-        <View style={styles.userInfo}>
-          <Text
-            style={theme === "light" ? styles.userName : styles.userNameDark}
-          >
-            {tempUser.name}
-          </Text>
-          <Text style={theme === "light" ? styles.userGym : styles.userGymDark}>
-            {tempUser.homeGym.name}
-          </Text>
-        </View>
-      </View>
+      </Pressable>
     );
   }
 
@@ -85,22 +113,24 @@ const FindFriends = () => {
         />
         <View style={{ width: "90%" }}>
           <TextInput
-            value={search}
-            onChangeText={(value) => {
-              setSearch(value);
-            }}
+            value={searchQuery}
+            onChangeText={(query) => handleSearch(query)}
             style={theme === "light" ? styles.input : styles.inputDark}
             placeholder="Search Users"
             clearButtonMode="always"
             autoCapitalize="none"
             autoCorrect={false}
+            placeholderTextColor={"grey"}
           />
         </View>
       </View>
-      {users.length >= 1 ? (
+      {data.length >= 1 ? (
         <FlatList
-          data={users}
-          renderItem={(user) => <UserCard user={user} />}
+          data={data}
+          keyExtractor={(user) => user.uid}
+          renderItem={(user) => (
+            <UserCard user={user.item} key={user.item.uid} />
+          )}
           style={styles.usersContainer}
           contentContainerStyle={{
             justifyContent: "center",
@@ -173,21 +203,21 @@ const styles = StyleSheet.create({
     color: "white",
   },
 
-  userCard: {},
-
-  userCardDark: {
+  userCard: {
     width: "100%",
     height: 75,
-    borderColor: colors.dark.accent,
-    borderWidth: 1,
-    backgroundColor: "#2c2f33",
+
     borderRadius: 10,
     display: "flex",
     flexDirection: "row",
     alignItems: "flex-start",
   },
 
-  userName: {},
+  userName: {
+    fontSize: 18,
+    color: "black",
+    fontWeight: "600",
+  },
 
   userNameDark: {
     fontSize: 18,
@@ -195,12 +225,17 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  userGym: {},
+  userGym: {
+    marginTop: 5,
+    fontSize: 16,
+    color: "grey",
+    fontWeight: "400",
+  },
 
   userGymDark: {
     marginTop: 5,
     fontSize: 16,
-    color: "whitesmoke",
+    color: "grey",
     fontWeight: "400",
   },
 
