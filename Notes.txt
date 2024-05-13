@@ -1,7 +1,14 @@
-Wednesday 1/9/23
+5/13/24
 
-- Create a New gym page
-    - User Looks for gym via Google Places API call
-    - User selects gym
-    - Gym data is saved to Database for users nearby to users
-    - 
+Past workout not working 
+Search friends is disabled
+
+Workouts will look like twitter timeline with Workouts
+* Workout of the day generator * 
+
+Streaks on the homepage
+    - Streaks not resetting
+
+Profile screen add a header
+
+Add an exercise, make it more prominent (on select exercise screen)
