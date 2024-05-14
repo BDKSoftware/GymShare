@@ -12,3 +12,4 @@ Streaks on the homepage
 Profile screen add a header
 
 Add an exercise, make it more prominent (on select exercise screen)
+
