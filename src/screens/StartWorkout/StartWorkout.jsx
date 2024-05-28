@@ -77,12 +77,30 @@ function StartWorkout(props) {
   }
 
   async function updateStreak() {
+    let today = new Date();
+    let yesterday = new Date(today - 86400000);
+
     let userRef = doc(db, "users", auth.currentUser.uid);
-    await getUser(auth.currentUser.uid).then(async (user) => {
+    let user = await getUser(auth.currentUser.uid);
+
+    let lastWorkout = new Date(user.lastWorkout);
+
+    if (lastWorkout < yesterday) {
+      await updateDoc(userRef, {
+        streak: 1,
+        lastWorkout: today.toDateString(),
+      });
+      return;
+    }
+
+    if (lastWorkout > yesterday && lastWorkout < today) {
+      return;
+    } else {
       await updateDoc(userRef, {
         streak: user.streak + 1,
+        lastWorkout: today.toDateString(),
       }).then(() => console.log("Streak Updated"));
-    });
+    }
   }
 
   async function finishWorkout() {

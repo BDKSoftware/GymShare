@@ -1,4 +1,4 @@
-import { Camera, CameraType } from "expo-camera";
+import { CameraView, CameraType } from "expo-camera";
 import { useState, useRef } from "react";
 import {
   Button,
@@ -12,13 +12,11 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function TakePhoto({ setPhoto, modal, setModal }) {
-  const [type, setType] = useState(CameraType.back);
+  const [type, setType] = useState("back");
   let cameraRef = useRef();
 
   function toggleCameraType() {
-    setType((current) =>
-      current === CameraType.back ? CameraType.front : CameraType.back
-    );
+    setType((current) => (current === "back" ? "front" : "back"));
   }
   async function takePicture() {
     let options = {
@@ -34,7 +32,7 @@ export default function TakePhoto({ setPhoto, modal, setModal }) {
 
   return (
     <Modal style={styles.container} visible={modal}>
-      <Camera style={styles.camera} type={type} ref={cameraRef}>
+      <CameraView style={styles.camera} type={type} ref={cameraRef}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.topButton} onPress={toggleCameraType}>
             <MaterialCommunityIcons
@@ -47,7 +45,7 @@ export default function TakePhoto({ setPhoto, modal, setModal }) {
             <MaterialCommunityIcons name="camera" size={24} color="black" />
           </TouchableOpacity>
         </View>
-      </Camera>
+      </CameraView>
     </Modal>
   );
 }

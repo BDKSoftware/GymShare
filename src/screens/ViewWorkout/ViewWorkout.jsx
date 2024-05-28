@@ -62,9 +62,7 @@ const ViewWorkout = (props) => {
       <View style={styles.topArea}>
         <Pressable
           onPress={() => {
-            navigation.navigate("Home", {
-              screen: "HomeScreen",
-            });
+            navigation.goBack();
           }}
         >
           <Text style={styles.dismiss}>Dismiss</Text>

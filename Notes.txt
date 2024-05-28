@@ -1,15 +1,9 @@
 5/13/24
 
-Past workout not working 
-Search friends is disabled
 
-Workouts will look like twitter timeline with Workouts
-* Workout of the day generator * 
+5. Change workout cards to look like twitter
+7. Search friends is disabled
 
-Streaks on the homepage
-    - Streaks not resetting
+-- Later --
 
-Profile screen add a header
-
-Add an exercise, make it more prominent (on select exercise screen)
-
+8. Workout of the Day generator

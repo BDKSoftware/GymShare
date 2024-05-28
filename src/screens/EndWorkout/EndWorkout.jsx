@@ -17,7 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { auth, db, storage } from "../../../firebase";
 import getUser from "../../utils/getUser";
 import TakePhoto from "./components/TakePhoto";
-import { Camera, CameraType } from "expo-camera";
+import { useCameraPermissions, Camera } from "expo-camera";
 import { uploadBytesResumable, ref, getDownloadURL } from "firebase/storage";
 import { updateDoc, doc } from "firebase/firestore";
 
@@ -30,7 +30,7 @@ function EndWorkout(props) {
   const [user, setUser] = useState(null);
   const [modal, setModal] = useState(false);
   const [photo, setPhoto] = useState(null);
-  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [permission, requestPermission] = useCameraPermissions();
   const [url, setUrl] = useState(null);
   const [loading, setLoading] = useState(false);
 

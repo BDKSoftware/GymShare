@@ -66,10 +66,8 @@ function Explore() {
     const [user, setUser] = useState(null);
 
     function handleCardPress(workout) {
-      navigation.navigate("Home", {
-        screen: "ViewWorkout",
-        params: { workout: workout },
-        initial: false,
+      navigation.navigate("ViewWorkout", {
+        workout: workout,
       });
     }
 

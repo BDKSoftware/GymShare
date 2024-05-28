@@ -54,14 +54,6 @@ function AddExerciseModal({
           <View style={styles.buttonContainer}>
             <Pressable
               onPress={() => {
-                setAddModal(true);
-                setModalVisible(false);
-              }}
-            >
-              <Ionicons name="add-sharp" size={28} color={colors.dark.accent} />
-            </Pressable>
-            <Pressable
-              onPress={() => {
                 setQrModal(true);
                 setModalVisible(false);
               }}
@@ -70,6 +62,16 @@ function AddExerciseModal({
             </Pressable>
           </View>
         </View>
+
+        <Pressable
+          style={styles.addCustomButton}
+          onPress={() => {
+            setAddModal(true);
+            setModalVisible(false);
+          }}
+        >
+          <Text style={styles.addCustomButtonText}> Add Custom Exercise</Text>
+        </Pressable>
 
         {exerciseGroup === "" ? (
           <FlatList
@@ -206,7 +208,7 @@ const styles = StyleSheet.create({
     width: "20%",
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
   },
 
@@ -246,5 +248,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "400",
     color: "white",
+  },
+
+  addCustomButton: {
+    backgroundColor: colors.dark.accent,
+    width: "90%",
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+
+  addCustomButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });

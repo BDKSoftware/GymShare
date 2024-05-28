@@ -53,12 +53,9 @@ function Profile() {
       style={theme === "light" ? styles.lightContainer : styles.darkContainer}
     >
       <View style={styles.logoutContainer}>
+        <Text style={styles.logoutContainerText}>Profile</Text>
         <TouchableOpacity onPress={userSignOut}>
-          <Ionicons
-            name="log-out-outline"
-            size={30}
-            color={theme === "light" ? colors.light.accent : colors.dark.accent}
-          />
+          <Ionicons name="log-out-outline" size={30} color={"white"} />
         </TouchableOpacity>
       </View>
 
@@ -113,7 +110,11 @@ function Profile() {
         <NavigationButton
           icon="calendar-outline"
           text="Past Workouts"
-          onPress={() => {}}
+          onPress={() =>
+            navigation.navigate("PastWorkouts", {
+              user: user,
+            })
+          }
         />
         <NavigationButton
           icon="barbell-sharp"
@@ -147,10 +148,19 @@ const styles = StyleSheet.create({
   logoutContainer: {
     width: "100%",
     height: 50,
+    flexDirection: "row",
     display: "flex",
-    alignItems: "flex-end",
-    justifyContent: "center",
-    paddingRight: 20,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    backgroundColor: colors.dark.accent,
+    borderRadius: 10,
+  },
+
+  logoutContainerText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "white",
   },
 
   imageContainer: {

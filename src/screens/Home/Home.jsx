@@ -119,14 +119,10 @@ function Home() {
         <Pressable onPress={navigateToCreateWorkout}>
           <Ionicons name="add-circle" size={24} color={colors.dark.accent} />
         </Pressable>
-        {user !== null ? (
+        {user !== null && (
           <Text style={styles.gymName} numberOfLines={1}>
-            {user.homeGym.name}
+            {`${user.streak} 🔥`}
           </Text>
-        ) : (
-          <Pressable onPress={handleGymSelect}>
-            <Text style={styles.noGymText}>Select Your Gym</Text>
-          </Pressable>
         )}
       </View>
       <View style={styles.titleContainer}>
@@ -190,10 +186,10 @@ const styles = StyleSheet.create({
   },
 
   gymName: {
-    fontSize: 14,
+    fontSize: 18,
     color: colors.dark.accent,
     flexWrap: "nowrap",
-    fontWeight: "800",
+    fontWeight: "700",
   },
 
   titleContainer: {

@@ -4,6 +4,8 @@ import Profile from "../screens/Profile/Profile";
 import Settings from "../screens/Settings/Settings";
 import AddGym from "../screens/AddGym/AddGym";
 import EditProfile from "../screens/EditProfile/EditProfile";
+import PastWorkouts from "../screens/PastWorkouts/PastWorkouts";
+import ViewWorkout from "../screens/ViewWorkout/ViewWorkout";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +22,8 @@ const ProfileNavigation = () => {
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="AddGym" component={AddGym} />
       <Stack.Screen name="EditProfile" component={EditProfile} />
+      <Stack.Screen name="PastWorkouts" component={PastWorkouts} />
+      <Stack.Screen name="ViewWorkout" component={ViewWorkout} />
     </Stack.Navigator>
   );
 };
