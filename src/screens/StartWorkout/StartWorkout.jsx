@@ -85,7 +85,13 @@ function StartWorkout(props) {
 
     let lastWorkout = new Date(user.lastWorkout);
 
-    if (lastWorkout < yesterday) {
+    // If 2 workouts happen on same day, streak does not increase
+    if (lastWorkout.getDate() == today.getDate()) {
+      return;
+    }
+
+    // If the last workout date is behind yesterday, reset streak to 1
+    if (lastWorkout.getDate() < yesterday.getDate()) {
       await updateDoc(userRef, {
         streak: 1,
         lastWorkout: today.toDateString(),
@@ -93,14 +99,11 @@ function StartWorkout(props) {
       return;
     }
 
-    if (lastWorkout > yesterday && lastWorkout < today) {
-      return;
-    } else {
-      await updateDoc(userRef, {
-        streak: user.streak + 1,
-        lastWorkout: today.toDateString(),
-      }).then(() => console.log("Streak Updated"));
-    }
+    // If other conditions are not met, iterate the streak and change lastWorkout date
+    await updateDoc(userRef, {
+      streak: user.streak + 1,
+      lastWorkout: today.toDateString(),
+    }).then(() => console.log("Streak Updated"));
   }
 
   async function finishWorkout() {
