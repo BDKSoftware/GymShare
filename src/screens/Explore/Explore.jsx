@@ -84,6 +84,10 @@ function Explore() {
       let sets = 0;
       let exercises = workout.exercises;
 
+      if (exercises == undefined) {
+        return 0;
+      }
+
       exercises.forEach((exercise) => {
         sets += exercise.sets.length;
       });
@@ -96,34 +100,40 @@ function Explore() {
     }, []);
 
     return (
-      <Pressable key={key} onPress={() => handleCardPress(workout)}>
-        <View style={theme === "light" ? styles.card : styles.cardDark}>
-          <View style={styles.cardTopArea}>
-            <Text
-              style={theme === "light" ? styles.cardName : styles.cardNameDark}
-            >
-              {workout.name}
-            </Text>
-            {user !== null && (
-              <Text style={styles.createdBy}>{`Created by ${user.name}`}</Text>
-            )}
-          </View>
-          <View style={styles.cardDetailsArea}>
-            <Image
-              style={styles.image}
-              source={{ uri: workout.photo }}
-              placeholder={Logo}
-              contentFit="cover"
-              placeholderContentFit="contain"
-            />
-            <View style={styles.setsContainer}>
-              <Text style={styles.setText}>{`${calculateSets(
-                workout
-              )} Sets`}</Text>
+      user !== null &&
+      workout.photo !== "" && (
+        <Pressable key={key} onPress={() => handleCardPress(workout)}>
+          <View style={theme === "light" ? styles.card : styles.cardDark}>
+            <View style={styles.cardTopArea}>
+              <View style={styles.cardUserArea}>
+                <Image
+                  placeholder={Logo}
+                  source={{ uri: user.image }}
+                  style={styles.userImage}
+                />
+                <View>
+                  <Text style={styles.userName}>{user.name}</Text>
+                </View>
+              </View>
+              <View style={styles.dateContainer}>
+                <Text style={styles.date}>{workoutDate}</Text>
+              </View>
+            </View>
+            <View style={styles.body}>
+              <Image source={workout.photo} style={styles.postImage}>
+                <View style={styles.nameContainer}>
+                  <Text style={styles.nameText}>{workout.name}</Text>
+                </View>
+                <View style={styles.setContainer}>
+                  <Text style={styles.setText}>{`${calculateSets(
+                    workout
+                  )} sets`}</Text>
+                </View>
+              </Image>
             </View>
           </View>
-        </View>
-      </Pressable>
+        </Pressable>
+      )
     );
   }
 
@@ -212,7 +222,7 @@ const styles = StyleSheet.create({
 
   card: {
     width: "100%",
-    height: 100,
+    height: 400,
     borderColor: colors.dark.accent,
     borderWidth: 3,
     marginBottom: 20,
@@ -223,7 +233,7 @@ const styles = StyleSheet.create({
 
   cardDark: {
     width: "100%",
-    height: 250,
+    height: 400,
     borderColor: colors.dark.accent,
     borderWidth: 1,
     marginBottom: 20,
@@ -233,12 +243,10 @@ const styles = StyleSheet.create({
 
   cardTopArea: {
     width: "100%",
-    height: "20%",
+    height: "10%",
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
-    backgroundColor: colors.dark.accent,
-    paddingHorizontal: 10,
   },
 
   cardDetailsArea: {
@@ -293,8 +301,28 @@ const styles = StyleSheet.create({
     backgroundColor: "#2c2f33",
   },
 
-  setsContainer: {
-    width: 60,
+  nameContainer: {
+    width: 100,
+    height: 30,
+    backgroundColor: colors.dark.accent,
+    position: "absolute",
+    bottom: 50,
+    right: 10,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "white",
+    borderWidth: 1,
+  },
+
+  nameText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+
+  setContainer: {
+    width: 100,
     height: 30,
     backgroundColor: colors.dark.accent,
     position: "absolute",
@@ -311,5 +339,67 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 14,
     fontWeight: "600",
+  },
+
+  userImage: {
+    height: 30,
+    width: 30,
+    borderRadius: 100,
+    marginRight: 10,
+  },
+
+  cardUserArea: {
+    width: "30%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    flexDirection: "row",
+    paddingLeft: 10,
+  },
+
+  workoutName: {
+    color: colors.dark.accent,
+    fontWeight: "500",
+    fontStyle: "italic",
+  },
+
+  userName: {
+    color: colors.dark.accent,
+    fontWeight: "700",
+  },
+
+  cardFooter: {
+    position: "absolute",
+    bottom: 0,
+    height: "5%",
+    width: "100%",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    paddingLeft: 10,
+  },
+
+  dateContainer: {
+    width: "30%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  date: {
+    color: colors.dark.accent,
+    fontSize: 14,
+    fontWeight: "200",
+  },
+
+  body: {
+    width: "100%",
+    height: "89%",
+    alignItems: "center",
+  },
+
+  postImage: {
+    width: "98%",
+    height: "100%",
+    borderRadius: 10,
   },
 });

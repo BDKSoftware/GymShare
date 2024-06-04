@@ -21,11 +21,10 @@ import getUser from "../../utils/getUser";
 
 import colors from "../../../theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
 import { auth } from "../../../firebase";
 
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { current } from "@reduxjs/toolkit";
+
 
 function AddGym() {
   const navigation = useNavigation();

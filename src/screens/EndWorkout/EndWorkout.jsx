@@ -112,15 +112,6 @@ function EndWorkout(props) {
         </View>
         <Text style={styles.text}>Workout Completed!</Text>
         <View style={styles.dataContainer}>
-          {user !== null && (
-            <>
-              <Text
-                style={
-                  theme === "light" ? { color: "black" } : { color: "white" }
-                }
-              >{`You are currently on a ${user.streak} day workout streak! `}</Text>
-            </>
-          )}
           <Pressable
             style={styles.addPhotoButton}
             onPress={handleAddPhotoPress}

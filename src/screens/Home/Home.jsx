@@ -18,6 +18,7 @@ import { useIsFocused } from "@react-navigation/native";
 import getUser from "../../utils/getUser";
 import { Ionicons } from "@expo/vector-icons";
 import RenderItem from "./components/RenderItem";
+import { useAuth } from "../../context/AuthContext";
 
 function Home() {
   const [location, setLocation] = useState(null);
