@@ -95,6 +95,43 @@ function Explore() {
       return sets;
     }
 
+    function getMostCommonGroup(workout) {
+      let tags = [];
+
+      let exercises = workout.exercises;
+
+      exercises.forEach((exercise) => {
+        if (!tags.includes(exercise.group)) {
+          tags.push(exercise.group);
+        }
+      });
+
+      if (tags.length < 1) {
+        return null;
+      }
+
+      if (tags.length < 2) {
+        return (
+          <View style={styles.setContainer}>
+            <Text style={styles.setText}>{tags[0]}</Text>
+          </View>
+        );
+      }
+
+      if (tags.length >= 2) {
+        return (
+          <>
+            <View style={styles.setContainer}>
+              <Text style={styles.setText}>{tags[0]}</Text>
+            </View>
+            <View style={styles.setContainer}>
+              <Text style={styles.setText}>{tags[1]}</Text>
+            </View>
+          </>
+        );
+      }
+    }
+
     useEffect(() => {
       getUserName();
     }, []);
@@ -102,37 +139,44 @@ function Explore() {
     return (
       user !== null &&
       workout.photo !== "" && (
-        <Pressable key={key} onPress={() => handleCardPress(workout)}>
-          <View style={theme === "light" ? styles.card : styles.cardDark}>
-            <View style={styles.cardTopArea}>
-              <View style={styles.cardUserArea}>
-                <Image
-                  placeholder={Logo}
-                  source={{ uri: user.image }}
-                  style={styles.userImage}
-                />
-                <View>
-                  <Text style={styles.userName}>{user.name}</Text>
+        <>
+          <Pressable key={key} onPress={() => handleCardPress(workout)}>
+            <View style={theme === "light" ? styles.card : styles.cardDark}>
+              <View style={styles.cardTopArea}>
+                <View style={styles.cardUserArea}>
+                  <Image
+                    placeholder={Logo}
+                    source={{ uri: user.image }}
+                    style={styles.userImage}
+                  />
+                  <View>
+                    <Text style={styles.userName}>{user.name}</Text>
+                  </View>
+                </View>
+                <View style={styles.dateContainer}>
+                  <Text style={styles.date}>{workoutDate}</Text>
                 </View>
               </View>
-              <View style={styles.dateContainer}>
-                <Text style={styles.date}>{workoutDate}</Text>
+              <View style={styles.body}>
+                <View style={styles.bodyContent}>
+                  <View style={styles.bodyContentTextArea}>
+                    <Text style={styles.bodyTitle}>{workout.name}</Text>
+                    <Text style={styles.bodySubText}>{`${
+                      workout.exercises.length
+                    } Exercises, ${calculateSets(workout)} Sets`}</Text>
+                  </View>
+                  <View style={styles.bodyContentTagsArea}>
+                    {getMostCommonGroup(workout)}
+                  </View>
+                </View>
+                <View style={styles.bodyImage}>
+                  <Image source={workout.photo} style={styles.workoutPhoto} />
+                </View>
               </View>
             </View>
-            <View style={styles.body}>
-              <Image source={workout.photo} style={styles.postImage}>
-                <View style={styles.nameContainer}>
-                  <Text style={styles.nameText}>{workout.name}</Text>
-                </View>
-                <View style={styles.setContainer}>
-                  <Text style={styles.setText}>{`${calculateSets(
-                    workout
-                  )} sets`}</Text>
-                </View>
-              </Image>
-            </View>
-          </View>
-        </Pressable>
+          </Pressable>
+          <View style={theme === "light" ? styles.line : styles.lineDark} />
+        </>
       )
     );
   }
@@ -191,6 +235,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
+    marginBottom: 10,
   },
 
   iconContainer: {
@@ -205,7 +250,7 @@ const styles = StyleSheet.create({
   dataContainer: {
     height: "95%",
     width: "100%",
-    padding: 5,
+    padding: 2,
   },
 
   title: {
@@ -222,28 +267,19 @@ const styles = StyleSheet.create({
 
   card: {
     width: "100%",
-    height: 400,
-    borderColor: colors.dark.accent,
-    borderWidth: 3,
-    marginBottom: 20,
-    borderRadius: 5,
-    backgroundColor: "white",
+    height: 150,
     overflow: "hidden",
   },
 
   cardDark: {
     width: "100%",
-    height: 400,
-    borderColor: colors.dark.accent,
-    borderWidth: 1,
-    marginBottom: 20,
-    borderRadius: 5,
+    height: 150,
     overflow: "hidden",
   },
 
   cardTopArea: {
     width: "100%",
-    height: "10%",
+    height: "30%",
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
@@ -322,22 +358,18 @@ const styles = StyleSheet.create({
   },
 
   setContainer: {
-    width: 100,
+    width: 75,
     height: 30,
     backgroundColor: colors.dark.accent,
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    borderRadius: 50,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    borderColor: "white",
-    borderWidth: 1,
+    marginRight: 10,
   },
 
   setText: {
     color: "white",
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "600",
   },
 
@@ -388,18 +420,80 @@ const styles = StyleSheet.create({
   date: {
     color: colors.dark.accent,
     fontSize: 14,
-    fontWeight: "200",
+    fontWeight: "400",
   },
 
   body: {
     width: "100%",
-    height: "89%",
+    height: "70%",
     alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
   },
 
   postImage: {
     width: "98%",
     height: "100%",
     borderRadius: 10,
+  },
+
+  bodyContent: {
+    width: "70%",
+    height: "100%",
+  },
+
+  bodyImage: {
+    width: "30%",
+    height: "100%",
+
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 5,
+  },
+
+  workoutPhoto: {
+    height: "90%",
+    width: "90%",
+    borderRadius: 10,
+  },
+
+  bodyTitle: {
+    color: colors.dark.accent,
+    fontWeight: "700",
+    padding: 5,
+  },
+
+  bodySubText: {
+    color: colors.dark.accent,
+    fontWeight: "500",
+    padding: 5,
+  },
+
+  bodyContentTextArea: {
+    height: "50%",
+    width: "100%",
+  },
+
+  bodyContentTagsArea: {
+    height: "50%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    flexDirection: "row",
+    padding: 5,
+  },
+
+  lineDark: {
+    marginVertical: 20,
+    height: 1,
+    borderColor: "#2c2f33",
+    borderWidth: 0.2,
+  },
+
+  line: {
+    marginVertical: 10,
+    height: 1,
+    borderColor: "lightgrey",
+    borderWidth: 0.2,
   },
 });
