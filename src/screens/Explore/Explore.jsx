@@ -8,7 +8,7 @@ import {
   Pressable,
   FlatList,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import colors from "../../../theme";
@@ -17,6 +17,7 @@ import { Image } from "expo-image";
 import Logo from "../../../assets/logo.png";
 
 import { auth, db } from "../../../firebase";
+import getUser from "../../utils/getUser";
 import {
   query,
   where,
@@ -28,17 +29,35 @@ import {
 
 function Explore() {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const theme = useSelector((state) => state.theme.value);
   const dispatch = useDispatch();
   const [workouts, setWorkouts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  async function getWorkouts() {
+  async function getData() {
+    const user = await getUser(auth.currentUser.uid);
+    getWorkouts(user);
+    return;
+  }
+
+  async function getWorkouts(user) {
+    if (user.following.length == 0) {
+      setWorkouts([]);
+      setLoading(false);
+      return;
+    }
     let temp = [];
     let workoutsRef = collection(db, "workouts");
-    let q = query(workoutsRef, where("creator", "!=", auth.currentUser.uid));
+    let q = query(workoutsRef, where("creator", "in", [...user.following]));
 
     const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      setWorkouts([]);
+      setLoading(false);
+      return;
+    }
 
     querySnapshot.forEach((doc) => {
       temp.push(doc.data());
@@ -51,11 +70,13 @@ function Explore() {
     });
 
     setWorkouts(sortedWorkouts);
+    setLoading(false);
+    return;
   }
 
   useEffect(() => {
-    getWorkouts();
-  }, []);
+    getData();
+  }, [isFocused]);
 
   function handleFriendPress() {
     navigation.navigate("FindFriends");
@@ -193,17 +214,31 @@ function Explore() {
           <FontAwesome name="search" size={20} color="white" />
         </Pressable>
       </View>
-      <View style={styles.dataContainer}>
-        <FlatList
-          data={workouts}
-          keyExtractor={(workout) => workout.id}
-          renderItem={(workout) => (
-            <WorkoutCard workout={workout.item} key={workout.item.id} />
-          )}
-          contentContainerStyle={{ paddingBottom: 100 }}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
+
+      {workouts.length > 0 && loading == false ? (
+        <View style={styles.dataContainer}>
+          <FlatList
+            data={workouts}
+            keyExtractor={(workout) => workout.id}
+            renderItem={(workout) => (
+              <WorkoutCard workout={workout.item} key={workout.item.id} />
+            )}
+            contentContainerStyle={{ paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+      ) : loading == false ? (
+        <View style={styles.noWorkoutsContainer}>
+          <Text style={styles.noWorkouts}>
+            You currently do not follow any users, use the search function above
+            to find your friends!
+          </Text>
+        </View>
+      ) : (
+        <View style={styles.noWorkoutsContainer}>
+          <ActivityIndicator color={colors.dark.accent} size="large" />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -495,5 +530,19 @@ const styles = StyleSheet.create({
     height: 1,
     borderColor: "lightgrey",
     borderWidth: 0.2,
+  },
+
+  noWorkoutsContainer: {
+    flex: 1,
+    width: "70%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  noWorkouts: {
+    alignSelf: "center",
+    justifyContent: "center",
+    color: colors.dark.accent,
+    textAlign: "center",
   },
 });

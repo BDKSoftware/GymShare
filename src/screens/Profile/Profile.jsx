@@ -73,16 +73,6 @@ function Profile() {
           <>
             <View style={styles.infoView}>
               <Ionicons
-                name="people-circle-sharp"
-                size={20}
-                color={colors.dark.accent}
-              />
-              <Text
-                style={styles.friendsText}
-              >{`${user?.friends.length} friends`}</Text>
-            </View>
-            <View style={styles.infoView}>
-              <Ionicons
                 name="location-sharp"
                 size={20}
                 color={colors.dark.accent}

@@ -59,10 +59,9 @@ const FindFriends = () => {
   }
 
   function handleUserPress(user) {
-    // navigation.navigate("User", {
-    //   params: { user: user },
-    // });
-    console.log("pressed");
+    navigation.navigate("User", {
+      user: user,
+    });
   }
 
   useEffect(() => {
@@ -71,7 +70,7 @@ const FindFriends = () => {
 
   function UserCard({ user }) {
     return (
-      <Pressable onPress={(user) => handleUserPress(user)}>
+      <Pressable onPress={() => handleUserPress(user)}>
         <View style={styles.userCard}>
           <View style={styles.imageContainer}>
             <Image

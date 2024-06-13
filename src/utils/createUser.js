@@ -14,8 +14,7 @@ export default async function createUser(uid, name, email) {
     pastWorkouts: [], // empty array for new users
     weight: 0, // User can set this property in the Profile screen
     height: 0, // User can set this property in the Profile screen
-    friends: [], // No friends to start with
-    friendRequests: [], // No friend requests to start with
+    following: [], // User will not be following any users to start
     visibility: "public", // Set visibility to public by default
     homeGym: {}, // User can set this property in the Profile screen
   })
