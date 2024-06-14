@@ -11,17 +11,17 @@ function FollowButton({ isFollowing, handlePress }) {
     >
       {isFollowing ? (
         <>
-          <SimpleLineIcons name="user-following" size={20} color="white" />
           <Text style={styles.followingText}>Following</Text>
+          <SimpleLineIcons name="user-following" size={20} color="white" />
         </>
       ) : (
         <>
+          <Text style={styles.followText}>Follow</Text>
           <SimpleLineIcons
             name="user-follow"
             size={20}
             color={colors.dark.accent}
           />
-          <Text style={styles.followText}>Follow</Text>
         </>
       )}
     </Pressable>
