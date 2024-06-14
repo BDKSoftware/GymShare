@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
 
   dataContainer: {
     height: "95%",
-    width: "100%",
+    width: "95%",
     padding: 2,
   },
 
@@ -393,18 +393,20 @@ const styles = StyleSheet.create({
   },
 
   setContainer: {
-    width: 75,
+    width: "30%",
     height: 30,
     backgroundColor: colors.dark.accent,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 10,
+    padding: 5,
+    overflow: "hidden",
   },
 
   setText: {
     color: "white",
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "600",
   },
 

@@ -108,7 +108,7 @@ function User(props) {
         {workouts.length > 0 ? (
           <FlatList
             style={{ width: "100%" }}
-            contentContainerStyle={{ paddingBottom: 100 }}
+            contentContainerStyle={{ paddingBottom: 500 }}
             data={workouts}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => <RenderItem item={item} theme={theme} />}
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
 
   titleDark: {
     color: "white",
-    fontSize: 20,
+    fontSize: "20%",
     fontWeight: "700",
   },
 
@@ -227,5 +227,6 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 10,
   },
 });

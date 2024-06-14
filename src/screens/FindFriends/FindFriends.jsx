@@ -85,6 +85,7 @@ const FindFriends = () => {
           <View style={styles.userInfo}>
             <Text
               style={theme === "light" ? styles.userName : styles.userNameDark}
+              numberOfLines={1}
             >
               {user.name}
             </Text>
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
   },
 
   userInfo: {
-    width: "50%",
+    width: "80%",
     height: "100%",
     padding: 10,
     justifyContent: "center",

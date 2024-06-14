@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   StyleSheet,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Image } from "expo-image";
 import { useNavigation } from "@react-navigation/native";
