@@ -1,9 +1,0 @@
-5/13/24
-
-
-5. Change workout cards to look like twitter
-7. Search friends is disabled
-
--- Later --
-
-8. Workout of the Day generator
