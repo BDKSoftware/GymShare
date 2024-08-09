@@ -23,7 +23,14 @@ const AuthNavigation = () => {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-        <Stack.Screen name="AuthLoading" component={AuthLoading} />
+        <Stack.Screen
+          name="AuthLoading"
+          component={AuthLoading}
+          options={{
+            gestureEnabled: false,
+            fullScreenGestureEnabled: false,
+          }}
+        />
         <Stack.Screen
           name="Root"
           component={RootNavigation}
