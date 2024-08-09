@@ -1,1 +1,10 @@
-- Create query to only include people you follow
+- Workout of the day generator
+- Home Screen Redesign
+    - Include Days of the week (Start with Sunday)
+    - Each day will display a different Workout
+- View Workout Screen Redesign
+
+
+Alessio to send over:
+    - Profile Screen 
+    - Socail Screen Design

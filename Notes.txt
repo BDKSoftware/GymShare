@@ -1,9 +1,10 @@
-5/13/24
+- Workout of the day generator
+- Home Screen Redesign
+    - Include Days of the week (Start with Sunday)
+    - Each day will display a different Workout
+- Redesign View Workout Screen
 
 
-5. Change workout cards to look like twitter
-7. Search friends is disabled
-
--- Later --
-
-8. Workout of the Day generator
+Alessio to send over:
+    - Profile Screen 
+    - Socail Screen Design
